@@ -5010,6 +5010,12 @@ details.toc[open] >div.body section .header+.doc_tree {
   color: var(--text);
   margin: 0;
 }
+.widgets .widget-wrapper.user-card p.username a {
+  color: inherit;
+}
+.widgets .widget-wrapper.user-card p.username a:hover {
+  color: #ff5724;
+}
 .widgets .widget-wrapper.user-card p.bio {
   font-size: 0.8125rem;
   margin: 0;
