@@ -27,8 +27,10 @@
 <meta property="og:site_name" content="Renxiaodaifu">
 <meta property="og:description" content="可靠计算系统设计分析与验证课程笔记 4，内容对应 Sessions 6–7：Error Detection，讨论 watchdog、heartbeat、Data Audits、控制流检查、应用感知断言，以及 RMK、SHD、AHD 和 Count&amp;Check">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ywang.top/assets/reliability/4/control-flow-signature.png">
+<meta property="og:image" content="https://ywang.top/assets/reliability/4/system-hang-detection-counters.png">
 <meta property="article:published_time" content="2026-10-30T09:05:00.000Z">
-<meta property="article:modified_time" content="2026-11-06T03:02:18.462Z">
+<meta property="article:modified_time" content="2026-11-13T12:49:46.666Z">
 <meta property="article:author" content="renxiaodaifu">
 <meta property="article:tag" content="笔记">
 <meta property="article:tag" content="可靠性">
@@ -36,6 +38,7 @@
 <meta property="article:tag" content="错误检测">
 <meta property="article:tag" content="控制流检查">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ywang.top/assets/reliability/4/control-flow-signature.png">
   
   
   
@@ -75,7 +78,7 @@
 <br></br>
 </div></widget>
 
-<widget class="widget-wrapper post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/posts/b7f9d216.html"><span class="title">密码学数学基础 - 离散对数与密码学应用</span></a><a class="item title" href="/posts/e1a8c430.html"><span class="title">密码学数学基础 - 阶、原根与指标</span></a><a class="item title" href="/posts/76b2a8ef.html"><span class="title">密码学数学基础 - 二次剩余与二次互反律</span></a><a class="item title" href="/posts/16e3453e.html"><span class="title">密码学数学基础 - 整数模与算术基本定理</span></a><a class="item title" href="/posts/79a693f2.html"><span class="title">密码学数学基础 - 欧几里得算法</span></a><a class="item title" href="/posts/c4b2918e.html"><span class="title">可靠计算系统 - 错误检测</span></a><a class="item title" href="/posts/e34b7f92.html"><span class="title">可靠计算系统 - 解析建模</span></a><a class="item title" href="/posts/a6c83f21.html"><span class="title">可靠计算系统 - 可靠性技术总览</span></a><a class="item title" href="/posts/559331df.html"><span class="title">可靠计算系统 - 基本概念</span></a><a class="item title" href="/posts/c881ebd0.html"><span class="title">Propositions as Types</span></a></div></widget>
+<widget class="widget-wrapper post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/posts/c4b2918e.html"><span class="title">可靠计算系统 - 错误检测</span></a><a class="item title" href="/posts/a6c83f21.html"><span class="title">可靠计算系统 - 可靠性技术总览</span></a><a class="item title" href="/posts/e34b7f92.html"><span class="title">可靠计算系统 - 解析建模</span></a><a class="item title" href="/posts/559331df.html"><span class="title">可靠计算系统 - 基本概念</span></a><a class="item title" href="/posts/f30c8b16.html"><span class="title">可靠计算系统 - 硬件与软件容错</span></a><a class="item title" href="/posts/d98f4a25.html"><span class="title">可靠计算系统 - 故障注入与实验验证</span></a><a class="item title" href="/posts/a63e2f10.html"><span class="title">密码学数学基础 - 集合、范畴与泛性质</span></a><a class="item title" href="/posts/b7f9d216.html"><span class="title">密码学数学基础 - 离散对数与密码学应用</span></a><a class="item title" href="/posts/e1a8c430.html"><span class="title">密码学数学基础 - 阶、原根与指标</span></a><a class="item title" href="/posts/76b2a8ef.html"><span class="title">密码学数学基础 - 二次剩余与二次互反律</span></a></div></widget>
 </div>
 
 </div></aside><div class="l_main" id="main">
@@ -88,7 +91,7 @@
   <div class="content">
     <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
 <span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E5%8F%AF%E9%9D%A0%E8%AE%A1%E7%AE%97/">可靠计算</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/%E5%8F%AF%E9%9D%A0%E8%AE%A1%E7%AE%97/%E5%8F%AF%E9%9D%A0%E8%AE%A1%E7%AE%97%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1%E5%88%86%E6%9E%90%E4%B8%8E%E9%AA%8C%E8%AF%81/">可靠计算系统设计分析与验证</a></div>
-<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-10-30T09:05:00.000Z">2026-10-30</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-06T03:02:18.462Z">2026-11-06</time></span></div><div class="flex-row" id="page-words"><span style="padding: 4px;">本文：7.9k字</span><span class="sep updated" style="padding: 4px;"></span><span class="text updated" style="padding: 4px;">阅读时长：27分</span></div><div class="flex-row" id="tag"><span class="text">标签：</span><a class="cap breadcrumb-link" href="/tags/%E5%8F%AF%E4%BE%9D%E8%B5%96%E8%AE%A1%E7%AE%97/">可依赖计算</a>&nbsp; <a class="cap breadcrumb-link" href="/tags/%E5%8F%AF%E9%9D%A0%E6%80%A7/">可靠性</a>&nbsp; <a class="cap breadcrumb-link" href="/tags/%E6%8E%A7%E5%88%B6%E6%B5%81%E6%A3%80%E6%9F%A5/">控制流检查</a>&nbsp; <a class="cap breadcrumb-link" href="/tags/%E7%AC%94%E8%AE%B0/">笔记</a>&nbsp; <a class="cap breadcrumb-link" href="/tags/%E9%94%99%E8%AF%AF%E6%A3%80%E6%B5%8B/">错误检测</a>&nbsp</div></div></div>
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-10-30T09:05:00.000Z">2026-10-30</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-13T12:49:46.666Z">2026-11-13</time></span></div><div class="flex-row" id="page-words"><span style="padding: 4px;">本文：7.9k字</span><span class="sep updated" style="padding: 4px;"></span><span class="text updated" style="padding: 4px;">阅读时长：27分</span></div><div class="flex-row" id="tag"><span class="text">标签：</span><a class="cap breadcrumb-link" href="/tags/%E5%8F%AF%E4%BE%9D%E8%B5%96%E8%AE%A1%E7%AE%97/">可依赖计算</a>&nbsp; <a class="cap breadcrumb-link" href="/tags/%E5%8F%AF%E9%9D%A0%E6%80%A7/">可靠性</a>&nbsp; <a class="cap breadcrumb-link" href="/tags/%E6%8E%A7%E5%88%B6%E6%B5%81%E6%A3%80%E6%9F%A5/">控制流检查</a>&nbsp; <a class="cap breadcrumb-link" href="/tags/%E7%AC%94%E8%AE%B0/">笔记</a>&nbsp; <a class="cap breadcrumb-link" href="/tags/%E9%94%99%E8%AF%AF%E6%A3%80%E6%B5%8B/">错误检测</a>&nbsp</div></div></div>
     
     <div class="bottom only-title">
       
@@ -266,11 +269,13 @@
 <p>这类方案需要专用资源和较紧密的耦合。缓存、多线程交错和复杂运行环境也会增加观察与重建路径的难度，因此更适合结构较简单的嵌入式场景</p>
 <p>软件方案则把程序分成基本块或其他代码单元，在入口、出口或分支附近插入检查代码，无需额外的监控处理器，但会增加执行指令和维护签名的开销</p>
 <h3 id="路径签名怎样表示执行">路径签名怎样表示执行</h3>
-<p>例如预先允许的事件序列为</p>
+<p>在基本块中插入 <code>Emit</code> 事件，可以把分支和循环编码成运行时序列</p>
+<!-- Figure source: Session6-ErrorDetection_v3.pdf, page 27 -->
+<div class="tag-plugin image"><div class="image-bg"><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="/assets/reliability/4/control-flow-signature.png" alt="用Emit事件记录分支与循环路径" data-fancybox="true" style="width:400px;"/></div><div class="image-meta"><span class="image-caption center">用Emit事件记录分支与循环路径</span></div></div>
+<p>图中允许的路径签名为</p>
 <p class="katex-block math-block"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>A</mi><mtext> </mtext><mi>B</mi><mo stretchy="false">(</mo><mi>C</mi><mi>D</mi><mi>B</mi><msup><mo stretchy="false">)</mo><mo>∗</mo></msup><mi>E</mi></mrow><annotation encoding="application/x-tex">A\,B(CDB)^*E
 </annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7387em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mbin mtight">∗</span></span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span></span></span></span></span></p>
-<p>它表示先出现 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo separator="true">,</mo><mi>B</mi></mrow><annotation encoding="application/x-tex">A,B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">A</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span>，再重复零次或多次 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mo separator="true">,</mo><mi>D</mi><mo separator="true">,</mo><mi>B</mi></mrow><annotation encoding="application/x-tex">C,D,B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span>，最后出现 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi></mrow><annotation encoding="application/x-tex">E</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span></span></span></span>。运行时通过插桩发出事件，形成实际序列，再检查其是否属于允许的语言</p>
-<p>这种签名比单纯检查“程序还活着”更细：即使程序最终返回了结果，如果事件顺序不合法，仍可被检测到</p>
+<p>每轮循环发出 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mo separator="true">,</mo><mi>D</mi><mo separator="true">,</mo><mi>B</mi></mrow><annotation encoding="application/x-tex">C,D,B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span>，退出时发出 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi></mrow><annotation encoding="application/x-tex">E</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span></span></span></span>。运行时检查实际事件序列是否匹配该表达式，即使程序仍在运行或最终返回了结果，也能识别不合法的执行路径</p>
 <h3 id="为什么要在跳转前检查">为什么要在跳转前检查</h3>
 <p>若检查代码只放在目标块入口，错误跳转可能直接落到任意指令位置，从而绕过检查代码，在下一个检测点之前就已经执行危险操作</p>
 <p><strong>PECOS（Preemptive Control Signatures）</strong> 的核心是先求出即将使用的目标地址，在实际跳转之前判断</p>
@@ -369,12 +374,11 @@
 <h2 id="SHD：用指令计数发现系统挂起">SHD：用指令计数发现系统挂起</h2>
 <p><strong>System Hang Detection（SHD）</strong> 关注内核长时间执行或等待、用户线程却无法推进的情形，例如内核无限循环或导致处理器无法正常交还给调度器的错误</p>
 <h3 id="用上下文切换建立进度界限">用上下文切换建立进度界限</h3>
-<p>在一定调度条件下，正常执行中相邻两次上下文切换之间的指令数量有一个可学习的上界。SHD 因而使用两类计数：</p>
-<ul>
-<li><strong>profiling counter</strong> 记录正常切换之间实际执行的指令数，适应负载变化</li>
-<li><strong>checking counter</strong> 从根据剖析结果设置的阈值递减，耗尽时触发 NMI</li>
-</ul>
-<p>若处理器长期没有正常切换，却持续消耗了超出预期的指令数，就报告疑似挂起。与固定墙钟超时相比，指令数量更直接反映处理器执行进度，但也依赖工作负载、调度策略和阈值是否匹配</p>
+<p>在一定调度条件下，正常执行中相邻两次上下文切换之间的指令数量有一个可学习的上界。SHD 使用剖析计数器与检查计数器共同判断是否超出这个界限</p>
+<!-- Figure source: Session6-ErrorDetection_v3.pdf, page 48 -->
+<div class="tag-plugin image"><div class="image-bg"><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="/assets/reliability/4/system-hang-detection-counters.png" alt="系统挂起检测中的剖析计数器与检查计数器" data-fancybox="true"/></div><div class="image-meta"><span class="image-caption center">系统挂起检测中的剖析计数器与检查计数器</span></div></div>
+<p>虚线的 <strong>profiling counter</strong> 在相邻切换之间累计指令数，为检查阈值提供依据；实线的 <strong>checking counter</strong> 从阈值递减。若迟迟没有正常切换，计数器耗尽就触发 NMI，报告疑似挂起</p>
+<p>与固定墙钟超时相比，指令数量更直接反映处理器执行进度，但效果仍取决于工作负载、调度策略和阈值是否匹配</p>
 <p>NMI 提供了一条不同于普通可屏蔽中断的进入路径，有助于在部分内核异常状态下触发检测。它也不是对任意硬件失效都有效的万能入口</p>
 <h3 id="实验结果怎样读">实验结果怎样读</h3>
 <p>在设备驱动调用场景中向内核代码内存注入错误，共执行 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1346</mn></mrow><annotation encoding="application/x-tex">1346</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1346</span></span></span></span> 次实验。按最先观察到的结果分类如下：</p>
@@ -536,7 +540,7 @@
     </section>
     </div>
 </article>
-<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"></div><div class="item" id="next"><div class="note">较早文章</div><a href="/posts/a6c83f21.html">可靠计算系统 - 可靠性技术总览</a></div></section></div>
+<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">较新文章</div><a href="/posts/a63e2f10.html">密码学数学基础 - 集合、范畴与泛性质</a></div><div class="item" id="next"><div class="note">较早文章</div><a href="/posts/a6c83f21.html">可靠计算系统 - 可靠性技术总览</a></div></section></div>
 
 
 
@@ -612,7 +616,7 @@
   });
 </script>
 </center>
-<center> <span class="totalcount">共发表 98 篇 Blog(s) · </span><span class="post-count">总计 267.5k 字</span></center><br/></div></footer>
+<center> <span class="totalcount">共发表 101 篇 Blog(s) · </span><span class="post-count">总计 293.1k 字</span></center><br/></div></footer>
 <div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
 <div class="widgets">
 
