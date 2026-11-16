@@ -1,0 +1,39 @@
+/* 站点级自定义样式
+   由 scripts/site-stats.js 注入到 head_end，覆盖主题默认表现 */
+
+/* 文章页：字数与阅读时长（对应主题 article_banner 的增强） */
+.bread-nav div#page-words span.sep:before {
+  content: '|';
+}
+.bread-nav div#page-words span.updated {
+  visibility: hidden;
+}
+.bread-nav:hover div#page-words span.updated {
+  visibility: visible;
+}
+
+/* 页脚统计 */
+.totalcount {
+  color: var(--text-p2);
+}
+.post-count {
+  scrollbar-width: none;
+  color: var(--text-p2);
+}
+.page-footer {
+  text-align: center;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* 友链卡片：放大头像与标题 */
+.users-wrap .grid-box {
+  grid-template-columns: repeat(auto-fill, minmax(172px, 1fr));
+}
+.users-wrap .user-card .card-link {
+  font-size: 18px;
+}
+.users-wrap .user-card .card-link img {
+  width: 96px;
+  height: 96px;
+}
