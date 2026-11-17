@@ -1,0 +1,1637 @@
+
+<!DOCTYPE html><html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.44.0" theme-name="Stellar" theme-version="1.44.0">
+  
+  
+  <meta name="generator" content="Hexo 7.2.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  <link rel="preconnect" href="https://gcore.jsdelivr.net" crossorigin><link rel="preconnect" href="https://unpkg.com" crossorigin><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>可靠计算：可靠计算系统 - 错误检测 - Renxiaodaifu</title>
+
+  <meta name="description" content="设计方法、解析建模、容错与故障注入实验">
+<meta property="og:type" content="website">
+<meta property="og:title" content="可靠计算系统 - 错误检测">
+<meta property="og:url" content="https://ywang.top/notes/reliability/ch04-error-detection/">
+<meta property="og:site_name" content="Renxiaodaifu">
+<meta property="og:description" content="设计方法、解析建模、容错与故障注入实验">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ywang.top/assets/reliability/4/control-flow-signature.png">
+<meta property="article:published_time" content="2026-10-30T09:05:00.000Z">
+<meta property="article:modified_time" content="2026-11-16T15:40:21.761Z">
+<meta property="article:author" content="renxiaodaifu">
+<meta property="article:tag" content="可靠性">
+<meta property="article:tag" content="错误检测">
+<meta property="article:tag" content="控制流检查">
+<meta property="article:tag" content="可依赖计算">
+<meta property="article:tag" content="笔记">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ywang.top/assets/reliability/4/control-flow-signature.png"><meta name="twitter:title" content="可靠计算系统 - 错误检测">
+  
+  
+  <meta name="keywords" content=",,,,">
+
+  <!-- feed -->
+  
+
+  <link rel="preload" href="/css/main.css?v=1.44.0" as="style">
+  <link rel="stylesheet" href="/css/main.css?v=1.44.0">
+
+
+  
+    <link rel="shortcut icon" href="https://ooo.0x0.ooo/2024/08/28/OtdcdI.jpg">
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Website","@id":"https://ywang.top/notes/reliability/ch04-error-detection/","author":{"@type":"Person","name":"renxiaodaifu","sameAs":[],"image":"https://ooo.0x0.ooo/2024/08/28/OtdcdI.jpg"},"name":"可靠计算系统 - 错误检测","description":"可靠计算系统设计分析与验证课程笔记 4，内容对应 Sessions 6–7：Error Detection，讨论 watchdog、heartbeat、Data Audits、控制流检查、应用感知断言，以及 RMK、SHD、AHD 和 Count&amp;Check","url":"https://ywang.top/notes/reliability/ch04-error-detection/"}</script>
+  <link rel="stylesheet" href="https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.6.0/lxgwwenkaiscreen.css" media="all"/>
+
+  <!-- icons.yml 驱动的 CSS 装饰图标 -->
+  
+  
+  <style>:root {
+  --icon-h3-left: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%2024%2024%22%3E%3C!--%20Icon%20from%20Solar%20by%20480%20Design%20-%20https%3A%2F%2Fcreativecommons.org%2Flicenses%2Fby%2F4.0%2F%20--%3E%3Cpath%20fill%3D%22currentColor%22%20d%3D%22M17.75%2019a.75.75%200%200%201-1.32.488l-6-7a.75.75%200%200%201%200-.976l6-7A.75.75%200%200%201%2017.75%205z%22%20opacity%3D%22.5%22%2F%3E%3Cpath%20fill%3D%22currentColor%22%20fill-rule%3D%22evenodd%22%20d%3D%22M13.488%2019.57a.75.75%200%200%200%20.081-1.058L7.988%2012l5.581-6.512a.75.75%200%201%200-1.138-.976l-6%207a.75.75%200%200%200%200%20.976l6%207a.75.75%200%200%200%201.057.082%22%20clip-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E");
+  --icon-h3-right: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%2024%2024%22%3E%3C!--%20Icon%20from%20Solar%20by%20480%20Design%20-%20https%3A%2F%2Fcreativecommons.org%2Flicenses%2Fby%2F4.0%2F%20--%3E%3Cpath%20fill%3D%22currentColor%22%20d%3D%22M6.25%2019a.75.75%200%200%200%201.32.488l6-7a.75.75%200%200%200%200-.976l-6-7A.75.75%200%200%200%206.25%205z%22%20opacity%3D%22.5%22%2F%3E%3Cpath%20fill%3D%22currentColor%22%20fill-rule%3D%22evenodd%22%20d%3D%22M10.512%2019.57a.75.75%200%200%201-.081-1.058L16.012%2012l-5.581-6.512a.75.75%200%201%201%201.139-.976l6%207a.75.75%200%200%201%200%20.976l-6%207a.75.75%200%200%201-1.058.082%22%20clip-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E");
+  --icon-quote-left: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%2024%2024%22%3E%3C!--%20Icon%20from%20BoxIcons%20Solid%20by%20Atisa%20-%20https%3A%2F%2Fcreativecommons.org%2Flicenses%2Fby%2F4.0%2F%20--%3E%3Cpath%20fill%3D%22currentColor%22%20d%3D%22M3.691%206.292C5.094%204.771%207.217%204%2010%204h1v2.819l-.804.161c-1.37.274-2.323.813-2.833%201.604A2.9%202.9%200%200%200%206.925%2010H10a1%201%200%200%201%201%201v7c0%201.103-.897%202-2%202H3a1%201%200%200%201-1-1v-5l.003-2.919c-.009-.111-.199-2.741%201.688-4.789M20%2020h-6a1%201%200%200%201-1-1v-5l.003-2.919c-.009-.111-.199-2.741%201.688-4.789C16.094%204.771%2018.217%204%2021%204h1v2.819l-.804.161c-1.37.274-2.323.813-2.833%201.604A2.9%202.9%200%200%200%2017.925%2010H21a1%201%200%200%201%201%201v7c0%201.103-.897%202-2%202%22%2F%3E%3C%2Fsvg%3E");
+  --icon-quote-right: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%2024%2024%22%3E%3C!--%20Icon%20from%20BoxIcons%20Solid%20by%20Atisa%20-%20https%3A%2F%2Fcreativecommons.org%2Flicenses%2Fby%2F4.0%2F%20--%3E%3Cpath%20fill%3D%22currentColor%22%20d%3D%22M20.309%2017.708C22.196%2015.66%2022.006%2013.03%2022%2013V5a1%201%200%200%200-1-1h-6c-1.103%200-2%20.897-2%202v7a1%201%200%200%200%201%201h3.078a2.9%202.9%200%200%201-.429%201.396c-.508.801-1.465%201.348-2.846%201.624l-.803.16V20h1c2.783%200%204.906-.771%206.309-2.292m-11.007%200C11.19%2015.66%2010.999%2013.03%2010.993%2013V5a1%201%200%200%200-1-1h-6c-1.103%200-2%20.897-2%202v7a1%201%200%200%200%201%201h3.078a2.9%202.9%200%200%201-.429%201.396c-.508.801-1.465%201.348-2.846%201.624l-.803.16V20h1c2.783%200%204.906-.771%206.309-2.292%22%2F%3E%3C%2Fsvg%3E");
+  --icon-loading: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%221em%22%20height%3D%221em%22%20viewBox%3D%220%200%2024%2024%22%3E%3Ccircle%20cx%3D%2218%22%20cy%3D%2212%22%20r%3D%220%22%20fill%3D%22currentColor%22%3E%3Canimate%20attributeName%3D%22r%22%20begin%3D%22.67%22%20calcMode%3D%22spline%22%20dur%3D%221.5s%22%20keySplines%3D%220.2%200.2%200.4%200.8%3B0.2%200.2%200.4%200.8%3B0.2%200.2%200.4%200.8%22%20repeatCount%3D%22indefinite%22%20values%3D%220%3B2%3B0%3B0%22%2F%3E%3C%2Fcircle%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%220%22%20fill%3D%22currentColor%22%3E%3Canimate%20attributeName%3D%22r%22%20begin%3D%22.33%22%20calcMode%3D%22spline%22%20dur%3D%221.5s%22%20keySplines%3D%220.2%200.2%200.4%200.8%3B0.2%200.2%200.4%200.8%3B0.2%200.2%200.4%200.8%22%20repeatCount%3D%22indefinite%22%20values%3D%220%3B2%3B0%3B0%22%2F%3E%3C%2Fcircle%3E%3Ccircle%20cx%3D%226%22%20cy%3D%2212%22%20r%3D%220%22%20fill%3D%22currentColor%22%3E%3Canimate%20attributeName%3D%22r%22%20begin%3D%220%22%20calcMode%3D%22spline%22%20dur%3D%221.5s%22%20keySplines%3D%220.2%200.2%200.4%200.8%3B0.2%200.2%200.4%200.8%3B0.2%200.2%200.4%200.8%22%20repeatCount%3D%22indefinite%22%20values%3D%220%3B2%3B0%3B0%22%2F%3E%3C%2Fcircle%3E%3C%2Fsvg%3E");
+}</style>
+  
+<!-- hexo injector head_end start --><link rel="stylesheet" href="/css/custom.css"><style>
+.wikilist-section{margin:2.2rem 0 .6rem;font-size:1.05rem;font-weight:600;opacity:.85}
+.wikilist-section:first-child{margin-top:0}
+.wikilist .post-list{margin-bottom:.4rem}
+.wikilist .post-card .excerpt p{margin:.35rem 0 0}
+</style><!-- hexo injector head_end end -->  <meta name="referrer" content="no-referrer-when-downgrade">
+</head>
+<body><div id="l_cover"></div><div class="l_body content" id="start" layout="page" type="tech" ><aside class="l_left leftbar-card" data-ui-surface="card"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<div class="wiki-home-wrap"><a class="wiki-home cap" href="/wiki/"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="currentColor" d="M17.75 19a.75.75 0 0 1-1.32.488l-6-7a.75.75 0 0 1 0-.976l6-7A.75.75 0 0 1 17.75 5z" opacity=".5"/><path fill="currentColor" fill-rule="evenodd" d="M13.488 19.57a.75.75 0 0 0 .081-1.058L7.988 12l5.581-6.512a.75.75 0 1 0-1.138-.976l-6 7a.75.75 0 0 0 0 .976l6 7a.75.75 0 0 0 1.057.082" clip-rule="evenodd"/></svg><span>所有项目</span></a></div>
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg"></div><img no-lazy class="avatar" src="https://ooo.0x0.ooo/2024/08/28/OtdcdI.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Renxiaodaifu</div><div class="sub normal cap">Tsinghua University</div><div class="sub hover cap" style="opacity:0"> Computer Science & INSC</div></a></div></header>
+
+
+<div class="search-wrapper" id="search-wrapper"><div class="search-form" role="search"><label class="search-button" for="search-input" aria-hidden="true"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></label><input type="search" class="search-input" id="search-input" aria-label="在 可靠计算 中搜索" data-filter="&#x2F;notes&#x2F;reliability&#x2F;" placeholder="在 可靠计算 中搜索"></div><div id="search-result"></div><div class="search-no-result">没有找到内容！</div></div>
+
+<div class="widgets">
+<svg class="grad-def" width="0" height="0" aria-hidden="true" focusable="false"><defs><linearGradient id="leftbar-active-icon-grad" x1="75%" y1="6.7%" x2="6.7%" y2="125%"><stop offset="20%" style="stop-color:var(--item-theme-light)"/><stop offset="60%" style="stop-color:var(--item-theme)"/></linearGradient></defs></svg>
+
+
+
+<widget class="widget-wrapper doc-tree-widget" data-wiki="reliability">
+  
+  <div class="widget-body"><section class="widget-section"><div class="widget-header dis-select"><span class="name">总览</span></div><div class="ui-collection" data-layout="list" data-variant="nav" data-density="compact">
+  
+    
+<a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/reliability/" title="总览" style="--item-grad:url(#leftbar-active-icon-grad);">
+  
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">总览</span>
+      
+      
+    </span>
+  
+  
+  
+  
+</a>
+
+  
+</div></section><section class="widget-section"><div class="widget-header dis-select"><span class="name">基础</span></div><div class="ui-collection" data-layout="list" data-variant="nav" data-density="compact">
+  
+    
+<a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/reliability/ch01-basics/" title="可靠计算系统 - 基本概念" style="--item-grad:url(#leftbar-active-icon-grad);">
+  
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">可靠计算系统 - 基本概念</span>
+      
+      
+    </span>
+  
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/reliability/ch02-analytical-modeling/" title="可靠计算系统 - 解析建模" style="--item-grad:url(#leftbar-active-icon-grad);">
+  
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">可靠计算系统 - 解析建模</span>
+      
+      
+    </span>
+  
+  
+  
+  
+</a>
+
+  
+</div></section><section class="widget-section"><div class="widget-header dis-select"><span class="name">技术与实践</span></div><div class="ui-collection" data-layout="list" data-variant="nav" data-density="compact">
+  
+    
+<a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/reliability/ch03-techniques/" title="可靠计算系统 - 可靠性技术总览" style="--item-grad:url(#leftbar-active-icon-grad);">
+  
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">可靠计算系统 - 可靠性技术总览</span>
+      
+      
+    </span>
+  
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item card-hover card-hover--spotlight is-active" href="/notes/reliability/ch04-error-detection/" title="可靠计算系统 - 错误检测" aria-current="page" style="--item-grad:url(#leftbar-active-icon-grad);">
+  
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">可靠计算系统 - 错误检测</span>
+      
+      
+    </span>
+  
+  
+  <span class="ui-collection__indicator"></span>
+  
+</a>
+
+  
+    
+<a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/reliability/ch05-fault-injection/" title="可靠计算系统 - 故障注入与实验验证" style="--item-grad:url(#leftbar-active-icon-grad);">
+  
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">可靠计算系统 - 故障注入与实验验证</span>
+      
+      
+    </span>
+  
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/reliability/ch06-fault-tolerance/" title="可靠计算系统 - 硬件与软件容错" style="--item-grad:url(#leftbar-active-icon-grad);">
+  
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">可靠计算系统 - 硬件与软件容错</span>
+      
+      
+    </span>
+  
+  
+  
+  
+</a>
+
+  
+</div></section></div>
+  
+</widget>
+
+
+
+
+
+
+<widget class="widget-wrapper slide-up recent-widget">
+  
+    <div class="widget-header dis-select">
+      <span class="name">最近更新</span>
+      
+    </div>
+  
+  <div class="widget-body"><div class="ui-collection" data-layout="list" data-variant="nav" data-density="compact">
+  
+    
+<a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/tcs/lecture-8/" title="What If P = NP?">
+  
+  
+  
+    <span class="ui-collection__content">
+      <span class="ui-collection__prefix">TCS</span>
+      <span class="ui-collection__title">What If P = NP?</span>
+      
+      
+    </span>
+  
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/tcs/lecture-a/" title="Probability Theory for Computer Science">
+  
+  
+  
+    <span class="ui-collection__content">
+      <span class="ui-collection__prefix">TCS</span>
+      <span class="ui-collection__title">Probability Theory for Computer Science</span>
+      
+      
+    </span>
+  
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/tcs/lecture-9/" title="Space Complexity">
+  
+  
+  
+    <span class="ui-collection__content">
+      <span class="ui-collection__prefix">TCS</span>
+      <span class="ui-collection__title">Space Complexity</span>
+      
+      
+    </span>
+  
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/tcs/lecture-3/" title="Church-Turing Thesis">
+  
+  
+  
+    <span class="ui-collection__content">
+      <span class="ui-collection__prefix">TCS</span>
+      <span class="ui-collection__title">Church-Turing Thesis</span>
+      
+      
+    </span>
+  
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/tcs/lecture-1/" title="Lambda Calculus">
+  
+  
+  
+    <span class="ui-collection__content">
+      <span class="ui-collection__prefix">TCS</span>
+      <span class="ui-collection__title">Lambda Calculus</span>
+      
+      
+    </span>
+  
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/tcs/lecture-2/" title="Programming in Lambda Calculus">
+  
+  
+  
+    <span class="ui-collection__content">
+      <span class="ui-collection__prefix">TCS</span>
+      <span class="ui-collection__title">Programming in Lambda Calculus</span>
+      
+      
+    </span>
+  
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/reliability/" title="总览">
+  
+  
+  
+    <span class="ui-collection__content">
+      <span class="ui-collection__prefix">可靠计算</span>
+      <span class="ui-collection__title">总览</span>
+      
+      
+    </span>
+  
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/signal/" title="总览">
+  
+  
+  
+    <span class="ui-collection__content">
+      <span class="ui-collection__prefix">信号处理原理</span>
+      <span class="ui-collection__title">总览</span>
+      
+      
+    </span>
+  
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/tcs/" title="总览">
+  
+  
+  
+    <span class="ui-collection__content">
+      <span class="ui-collection__prefix">TCS</span>
+      <span class="ui-collection__title">总览</span>
+      
+      
+    </span>
+  
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/netsec/" title="总览">
+  
+  
+  
+    <span class="ui-collection__content">
+      <span class="ui-collection__prefix">网络安全</span>
+      <span class="ui-collection__title">总览</span>
+      
+      
+    </span>
+  
+  
+  
+  
+</a>
+
+  
+</div></div>
+  
+</widget>
+
+
+</div>
+
+</div></aside><div class="l_main" id="main" data-ui-surface="content">
+
+
+
+
+
+
+<div class="article-banner-wrap slide-up"><div class="article banner top">
+  <div class="content">
+    
+    <div class="top bread-nav footnote"><div class="top-row"><div class="left" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
+<span class="sep"></span><a class="cap breadcrumb" id="menu" href="/wiki/">文档</a><span class="sep"></span><a class="cap breadcrumb" id="proj" href="/notes/reliability/">可靠计算</a></div></div><div class="meta-row">
+<div class="flex-row" id="post-meta"><span class="text created">更新于：<time datetime="2026-11-16T15:40:21.761Z">2026-11-16</time></span></div>
+</div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>可靠计算系统 - 错误检测</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div></div>
+<article class="md-text content slide-up"><p>可靠计算系统设计分析与验证课程笔记 4，内容对应 Sessions 6–7：Error Detection，讨论 watchdog、heartbeat、Data Audits、控制流检查、应用感知断言，以及 RMK、SHD、AHD 和 Count&amp;Check</p>
+<span id="more"></span>
+<h1>错误检测</h1>
+<p>上一篇介绍了可靠性技术的分工。这一篇展开容错中的检测环节：系统如何发现自己已经进入错误状态，怎样在错误传播到服务接口之前作出反应？</p>
+<p>检测器通常直接观察的是错误的表现，例如迟迟没有完成一个步骤、变量超出合法范围，或者执行路径偏离预期。观察到异常并不等于已经知道根因，而没有告警也不等于系统一定正确。理解每个检测器观察了什么，是分析覆盖率的起点</p>
+<h2 id="怎样评价一个错误检测器">怎样评价一个错误检测器</h2>
+<p>检测器至少涉及四个方面：</p>
+<ul>
+<li><strong>覆盖率</strong>：目标错误中，有多少被检测到</li>
+<li><strong>检测延迟</strong>：从错误发生或被激活，到发出告警经过多久</li>
+<li><strong>误报与漏报</strong>：正确行为被判错，以及错误行为没有被发现</li>
+<li><strong>开销</strong>：额外时间、内存、代码体积、硬件资源和运维成本</li>
+</ul>
+<p>覆盖率首先需要一个明确的分母。故障注入实验中，常见统计对象包括注入事件、真正被激活的错误，以及最终影响输出或造成失效的错误，三者不能混用</p>
+<p>例如某个检测目标集合为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi></mrow><annotation encoding="application/x-tex">E</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span></span></span></span>，在其中被发现的事件集合为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span></span></span></span>，则</p>
+<p class="katex-block math-block"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">v</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">g</mi><mi mathvariant="normal">e</mi></mrow><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∣</mi><mi>D</mi><mo>∩</mo><mi>E</mi><mi mathvariant="normal">∣</mi></mrow><mrow><mi mathvariant="normal">∣</mi><mi>E</mi><mi mathvariant="normal">∣</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">\mathrm{Coverage}=\frac{|D\cap E|}{|E|}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathrm">Coverage</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.363em;vertical-align:-0.936em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mord">∣</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∩</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mord">∣</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<p>检测器还可能发现 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi></mrow><annotation encoding="application/x-tex">E</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span></span></span></span> 之外的内部异常，因此不能把所有告警数量直接除以 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∣</mi><mi>E</mi><mi mathvariant="normal">∣</mi></mrow><annotation encoding="application/x-tex">|E|</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mord">∣</span></span></span></span>。误报率同样要说明按检查次数、请求数、运行次数还是时间统计</p>
+<h3 id="检测必须与恢复衔接">检测必须与恢复衔接</h3>
+<p>容错链通常包含检测、定位、遏制和恢复。错误被发现后，可以停止继续输出、隔离组件、切换副本或恢复 checkpoint。如果只记录日志，而错误结果已经提交给外部，检测对当前请求的保护可能已经太晚</p>
+<p>在前面介绍的可用性模型中，缩短发现与恢复的总时间能够降低平均停机时间。但检测器不会自动减少原始故障发生的概率，其效果取决于告警时机、恢复策略及是否引入误切换</p>
+<h2 id="watchdog：是否在期限内完成了进度">watchdog：是否在期限内完成了进度</h2>
+<p><strong>Watchdog Timer</strong> 是一种成本较低的检测方法。被监控程序必须在超时前重置定时器；如果长期没有重置，监控方就怀疑程序已经失去正常进展</p>
+<p>正常路径可以表示为</p>
+<p class="katex-block math-block"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>完成阶段工作</mtext><mo>⟶</mo><mtext>重置定时器</mtext><mo>⟶</mo><mtext>下一阶段工作</mtext></mrow><annotation encoding="application/x-tex">\text{完成阶段工作}\longrightarrow\text{重置定时器}
+\longrightarrow\text{下一阶段工作}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6943em;vertical-align:-0.011em;"></span><span class="mord text"><span class="mord cjk_fallback">完成阶段工作</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⟶</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6943em;vertical-align:-0.011em;"></span><span class="mord text"><span class="mord cjk_fallback">重置定时器</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⟶</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord cjk_fallback">下一阶段工作</span></span></span></span></span></span></p>
+<p>发生错误时，若程序不再到达重置点，定时器到期就能触发告警和恢复</p>
+<h3 id="重置点放在哪里很关键">重置点放在哪里很关键</h3>
+<p>假设一个线程陷入死循环，而循环内部仍不断重置 watchdog，监控方就永远不会超时。因此重置操作应当对应真正需要验证的工作进度，而不是任意一段仍能运行的代码</p>
+<p>同样，一个后台监控线程仍在刷新定时器，并不说明业务线程没有死锁。watchdog 观察的是“重置动作是否发生”，没有直接检查业务数据或结果</p>
+<p>超时值还要求正常工作耗时相对可预测。阈值太短，会把负载波动或慢操作误判为故障；阈值太长，则增加发现故障的时间。对于每阶段耗时差异很大的程序，应按阶段设计进度检查和期限</p>
+<h3 id="它主要改善哪一个指标">它主要改善哪一个指标</h3>
+<p>例如，历史系统使用 watchdog 监测子系统自检、缓冲区归还、锁释放以及处理器响应等事件。重置系统或释放资源可以缩短停机时间，因而改善可用性</p>
+<p>但若故障已经造成服务中断，再快速重启也不能把“从未失效”的任务历史恢复回来。如果检测发生在错误传播到服务接口之前，并成功恢复，才有机会避免这次外部失效。因此分析效果时要写清服务边界和检测时机</p>
+<h2 id="heartbeat：从本机进度扩展到分布式响应">heartbeat：从本机进度扩展到分布式响应</h2>
+<p>在分布式系统中，监控方定期向进程或节点发送探测消息，并等待回复；超过预定时间没有响应，就将其标记为疑似失效，并启动后续处置。节点主动周期性上报也是常见组织方式</p>
+<p>heartbeat 与 watchdog 的共同点是用时间约束观察活性，但 heartbeat 还受到网络延迟、丢包和对端负载的影响。没有收到回复，可能是进程失效，也可能是网络暂时拥塞，因此超时首先提供的是怀疑信号</p>
+<h3 id="Adaptive-Heartbeat-与-Smart-Heartbeat-解决不同问题">Adaptive Heartbeat 与 Smart Heartbeat 解决不同问题</h3>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>改变什么</th>
+<th>主要目的</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>固定超时 heartbeat</td>
+<td>使用预先约定的期限</td>
+<td>实现简单，适合负载与延迟较稳定的场景</td>
+</tr>
+<tr>
+<td>Adaptive Heartbeat</td>
+<td>根据网络和节点状态调整超时值</td>
+<td>减少环境变化造成的误报</td>
+</tr>
+<tr>
+<td>Smart Heartbeat</td>
+<td>回复前执行预定义健康检查</td>
+<td>让回复包含更多业务健康信息</td>
+</tr>
+</tbody>
+</table></div>
+<p>Adaptive Heartbeat 处理“等多久才合理”，Smart Heartbeat 处理“回复能代表什么”。仅把阈值调得更准确，无法解决“回复线程正常而业务线程已经死锁”的覆盖问题</p>
+<p>Smart Heartbeat 可以在回复前检查关键线程、队列或必要的数据关系，但检查范围仍需明确。检测路径本身也依赖 CPU、网络和调度资源，不能默认监控方永远不受故障影响</p>
+<h2 id="Capability-Checking-与-Consistency-Checking">Capability Checking 与 Consistency Checking</h2>
+<p>这类机制不主要观察耗时，而是判断当前操作或数值是否满足已知约束</p>
+<p><strong>Capability Checking</strong> 限制哪些主体可以访问哪些对象，例如处理器或进程是否允许访问某个内存区域、I/O 设备或受保护资源。越权操作会引发异常或拒绝访问</p>
+<p><strong>Consistency Checking</strong> 则检查状态是否落在允许范围内，例如</p>
+<ul>
+<li>概率值必须位于 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[0,1]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose">]</span></span></span></span></li>
+<li>目标地址必须存在，并满足对应访问条件</li>
+<li>指令操作码必须是体系结构定义的有效编码</li>
+<li>算术运算不能超出所要求的数值范围</li>
+</ul>
+<p>两类机制可以互补：地址本身可能存在，但当前进程没有访问权限；操作可能获得授权，但输入值已经不符合应用语义</p>
+<p>这类检查的优势是约束明确、检测位置接近错误使用点。其覆盖范围也由约束决定：一个错误值仍落在合法区间内，范围检查就无法发现它</p>
+<h2 id="异常处理：把硬件发现的异常交给软件">异常处理：把硬件发现的异常交给软件</h2>
+<p>处理器和 MMU 可以发现非法指令、缺页、保护违规和某些算术异常，再将控制权转交给操作系统。以 x86 和 Linux 为例介绍这条处理路径</p>
+<h3 id="Fault、Trap-与-Abort">Fault、Trap 与 Abort</h3>
+<p>这里的 <strong>fault</strong> 是 x86 的异常分类名称，需要与可靠性故障链中的 Fault 区分。按处理后返回位置和可恢复性，典型分类为</p>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>分类</th>
+<th>处理语义</th>
+<th>典型例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fault</td>
+<td>保存的位置指向引发异常的指令，修复条件后可以重新执行</td>
+<td>缺页、某些保护违规</td>
+</tr>
+<tr>
+<td>Trap</td>
+<td>在触发指令完成后报告，通常从后续指令继续</td>
+<td>软件断点</td>
+</tr>
+<tr>
+<td>Abort</td>
+<td>严重异常，可能无法精确报告触发位置，也不能按普通方式重新执行</td>
+<td>双重故障等严重异常</td>
+</tr>
+</tbody>
+</table></div>
+<p>这种分类依据异常的体系结构语义，不能简单等同于“无意触发”与“有意触发”，具体定义可参见 <a target="_blank" rel="noopener" href="https://cdrdv2-public.intel.com/825758/253668-sdm-vol-3a.pdf">Intel 系统编程手册中的异常分类</a></p>
+<h3 id="缺页不一定意味着程序出错">缺页不一定意味着程序出错</h3>
+<p>缺页可能来自按需分页或写时复制，也可能来自非法地址访问。前者是正常的内存管理过程，内核建立映射后可以重试指令；后者则可能导致向用户进程发送信号或进入内核错误处理路径</p>
+<p>还要区分 <strong>TLB 未命中</strong> 和<strong>缺页异常</strong>：TLB 中没有缓存某个地址转换，不代表页不存在。若页表给出有效映射，地址转换仍可以继续完成</p>
+<h3 id="硬件和软件怎样衔接">硬件和软件怎样衔接</h3>
+<p>从概念上看，处理过程为</p>
+<p class="katex-block math-block"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>检测异常</mtext><mo>⟶</mo><mtext>确定异常向量</mtext><mo>⟶</mo><mtext>保存必要上下文</mtext><mo>⟶</mo><mtext>进入处理程序</mtext></mrow><annotation encoding="application/x-tex">\text{检测异常}\longrightarrow\text{确定异常向量}
+\longrightarrow\text{保存必要上下文}\longrightarrow\text{进入处理程序}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6943em;vertical-align:-0.011em;"></span><span class="mord text"><span class="mord cjk_fallback">检测异常</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⟶</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6943em;vertical-align:-0.011em;"></span><span class="mord text"><span class="mord cjk_fallback">确定异常向量</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⟶</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6943em;vertical-align:-0.011em;"></span><span class="mord text"><span class="mord cjk_fallback">保存必要上下文</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⟶</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord cjk_fallback">进入处理程序</span></span></span></span></span></span></p>
+<p>处理程序根据异常类型、访问地址以及用户态或内核态等上下文，决定补齐资源、返回错误、发送信号、终止进程，还是执行更严重的系统处置</p>
+<p>在异常处理过程中也可能再次出错，或者因为未释放锁而演化为挂起，所以捕获一次异常并不意味着故障影响已经结束</p>
+<h2 id="Data-Audits：从数值合法到业务关系一致">Data Audits：从数值合法到业务关系一致</h2>
+<p><strong>Data Audits</strong> 在电信交换系统等场景中广泛使用。它把应用已知的数据约束变成周期性或事件触发的检查，既检查单个字段，也检查记录之间的结构与语义关系</p>
+<h3 id="静态数据与动态数据">静态数据与动态数据</h3>
+<p>对运行中不应变化的静态数据，可以在可信初始化阶段计算基准校验和，之后周期性重新计算并比较。若结果不同，就怀疑发生了非预期修改</p>
+<p>动态数据正常情况下就会变化，不能一直与启动时的比特内容比较。可以改用字段范围、枚举值、状态转换规则或其他不变量，判断当前值是否合法</p>
+<h3 id="Structural-Audit">Structural Audit</h3>
+<p>考虑数据库采用固定且已知的记录大小，系统表保存布局信息。审计器根据记录大小计算各记录头应当出现的偏移，再检查相应位置的头字段是否符合预期</p>
+<p>这类检查能发现记录错位、表结构损坏等问题。其前提是布局元数据本身可信；不同存储格式需要相应的结构检查方法</p>
+<h3 id="Semantic-Referential-Integrity-Check">Semantic Referential Integrity Check</h3>
+<p>比“记录存在”更进一步的是：记录之间的关系是否闭合。以一次语音连接为例，使用三张表：</p>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>表</th>
+<th>关键字段</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>进程表</td>
+<td>Process ID、Connection ID、Status</td>
+</tr>
+<tr>
+<td>连接表</td>
+<td>Connection ID、Channel ID、Caller ID</td>
+</tr>
+<tr>
+<td>资源表</td>
+<td>Channel ID、Process ID、Status</td>
+</tr>
+</tbody>
+</table></div>
+<p>活跃连接应当形成一致的依赖环：</p>
+<p class="katex-block math-block"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>Connection&nbsp;ID</mtext><mo>⟶</mo><mtext>Channel&nbsp;ID</mtext><mo>⟶</mo><mtext>Process&nbsp;ID</mtext><mo>⟶</mo><mtext>Connection&nbsp;ID</mtext></mrow><annotation encoding="application/x-tex">\text{Connection ID}\longrightarrow\text{Channel ID}
+\longrightarrow\text{Process ID}\longrightarrow\text{Connection ID}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6943em;vertical-align:-0.011em;"></span><span class="mord text"><span class="mord">Connection&nbsp;ID</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⟶</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7054em;vertical-align:-0.011em;"></span><span class="mord text"><span class="mord">Channel&nbsp;ID</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⟶</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6943em;vertical-align:-0.011em;"></span><span class="mord text"><span class="mord">Process&nbsp;ID</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⟶</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">Connection&nbsp;ID</span></span></span></span></span></span></p>
+<p>如果连接已经结束，资源表仍标记通道被占用，或者进程引用的连接记录已经消失，局部字段可能都在合法范围内，但整体关系已经不一致。沿依赖环审计，可以发现资源泄漏、孤立记录和关键属性损坏</p>
+<p>实现时还应考虑合法的更新中间状态，例如通过一致快照或事务边界进行检查，避免把正常并发更新误认为数据损坏</p>
+<h2 id="控制流监测：程序是否按允许的路径执行">控制流监测：程序是否按允许的路径执行</h2>
+<p>数据可能损坏，指令地址、返回地址和分支目标同样可能出错。<strong>控制流监测</strong>尝试把执行路径编码成签名，再与预期路径比较</p>
+<p>这里的签名是执行特征，不是密码学中的数字签名</p>
+<h3 id="硬件与软件两种组织方式">硬件与软件两种组织方式</h3>
+<p>硬件方案可用一个 watchdog processor 观察主处理器的地址与数据流，并与预先计算的签名比较。签名可以嵌入程序，也可以存放在监控处理器自己的存储中</p>
+<p>这类方案需要专用资源和较紧密的耦合。缓存、多线程交错和复杂运行环境也会增加观察与重建路径的难度，因此更适合结构较简单的嵌入式场景</p>
+<p>软件方案则把程序分成基本块或其他代码单元，在入口、出口或分支附近插入检查代码，无需额外的监控处理器，但会增加执行指令和维护签名的开销</p>
+<h3 id="路径签名怎样表示执行">路径签名怎样表示执行</h3>
+<p>在基本块中插入 <code>Emit</code> 事件，可以把分支和循环编码成运行时序列</p>
+<!-- Figure source: Session6-ErrorDetection_v3.pdf, page 27 -->
+<div class="tag-plugin image"><div class="image-bg" style="width:100%;"><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="/assets/reliability/4/control-flow-signature.png" alt="用Emit事件记录分支与循环路径" data-fancybox="true" style="width:400px;" onerror="this.src=&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2rem' height='2rem' viewBox='0 0 24 24'%3E%3C!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --%3E%3Cpath fill='%23F44336' d='M22 12.698c-.002 1.47-.013 2.718-.096 3.743c-.097 1.19-.296 2.184-.74 3.009a4.2 4.2 0 0 1-.73.983c-.833.833-1.893 1.21-3.237 1.39C15.884 22 14.2 22 12.053 22h-.106c-2.148 0-3.83 0-5.144-.177c-1.343-.18-2.404-.557-3.236-1.39c-.738-.738-1.12-1.656-1.322-2.795c-.2-1.12-.236-2.512-.243-4.241Q1.999 12.737 2 12v-.054c0-2.148 0-3.83.177-5.144c.18-1.343.557-2.404 1.39-3.236s1.893-1.21 3.236-1.39c1.168-.157 2.67-.175 4.499-.177a.697.697 0 1 1 0 1.396c-1.855.002-3.234.018-4.313.163c-1.189.16-1.906.464-2.436.994S3.72 5.8 3.56 6.99C3.397 8.2 3.395 9.788 3.395 12v.784l.932-.814a2.14 2.14 0 0 1 2.922.097l3.99 3.99a1.86 1.86 0 0 0 2.385.207l.278-.195a2.79 2.79 0 0 1 3.471.209l2.633 2.37c.265-.557.423-1.288.507-2.32c.079-.972.09-2.152.091-3.63a.698.698 0 0 1 1.396 0' opacity='.5'/%3E%3Cpath fill='%23F44336' fill-rule='evenodd' d='M17.5 11c-2.121 0-3.182 0-3.841-.659S13 8.621 13 6.5s0-3.182.659-3.841S15.379 2 17.5 2s3.182 0 3.841.659S22 4.379 22 6.5s0 3.182-.659 3.841S19.621 11 17.5 11m-1.47-7.03a.75.75 0 1 0-1.06 1.06l1.47 1.47l-1.47 1.47a.75.75 0 0 0 1.06 1.06l1.47-1.47l1.47 1.47a.75.75 0 1 0 1.06-1.06L18.56 6.5l1.47-1.47a.75.75 0 0 0-1.06-1.06L17.5 5.44z' clip-rule='evenodd'/%3E%3C/svg%3E&quot;"><div class="lazy-icon"></div></div><div class="image-meta"><span class="image-caption center">用Emit事件记录分支与循环路径</span></div></div>
+<p>图中允许的路径签名为</p>
+<p class="katex-block math-block"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>A</mi><mtext> </mtext><mi>B</mi><mo stretchy="false">(</mo><mi>C</mi><mi>D</mi><mi>B</mi><msup><mo stretchy="false">)</mo><mo>∗</mo></msup><mi>E</mi></mrow><annotation encoding="application/x-tex">A\,B(CDB)^*E
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7387em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mbin mtight">∗</span></span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span></span></span></span></span></p>
+<p>每轮循环发出 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mo separator="true">,</mo><mi>D</mi><mo separator="true">,</mo><mi>B</mi></mrow><annotation encoding="application/x-tex">C,D,B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span>，退出时发出 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi></mrow><annotation encoding="application/x-tex">E</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span></span></span></span>。运行时检查实际事件序列是否匹配该表达式，即使程序仍在运行或最终返回了结果，也能识别不合法的执行路径</p>
+<h3 id="为什么要在跳转前检查">为什么要在跳转前检查</h3>
+<p>若检查代码只放在目标块入口，错误跳转可能直接落到任意指令位置，从而绕过检查代码，在下一个检测点之前就已经执行危险操作</p>
+<p><strong>PECOS（Preemptive Control Signatures）</strong> 的核心是先求出即将使用的目标地址，在实际跳转之前判断</p>
+<p class="katex-block math-block"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>X</mi><mrow><mi mathvariant="normal">o</mi><mi mathvariant="normal">u</mi><mi mathvariant="normal">t</mi></mrow></msub><mo>∈</mo><mo stretchy="false">{</mo><msub><mi>X</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>X</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>X</mi><mi>k</mi></msub><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">X_{\mathrm{out}}\in\{X_1,X_2,\ldots,X_k\}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0785em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">out</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0785em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0785em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0785em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">}</span></span></span></span></span></p>
+<p>其中右侧是允许的目标集合。不满足时先触发异常，尽量阻止非法目标中的指令被执行。可以通过断言块和异常机制实现这一过程</p>
+<p>这种前置检查缩短了错误传播的窗口，但如果错误选择的是另一个合法目标，单纯的目标集合检查仍可能接受它。控制流符合图结构，不代表这次输入下的分支选择一定正确</p>
+<h2 id="应用感知错误检测（Application-Aware-Error-Detection）">应用感知错误检测（Application-Aware Error Detection）</h2>
+<p>通用机制知道地址、指令和时间约束，应用感知检测器还利用变量的含义以及变量之间的关系，自动或人工生成运行时断言</p>
+<p>一个检测器可以看作一个二元选择：</p>
+<p class="katex-block math-block"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>检测器位置</mtext><mo>=</mo><mo stretchy="false">(</mo><mtext>程序位置</mtext><mo separator="true">,</mo><mtext>&nbsp;被检查变量</mtext><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\text{检测器位置}=(\text{程序位置},\ \text{被检查变量})
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord cjk_fallback">检测器位置</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord text"><span class="mord cjk_fallback">程序位置</span></span><span class="mpunct">,</span><span class="mspace">&nbsp;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord cjk_fallback">被检查变量</span></span><span class="mclose">)</span></span></span></span></span></p>
+<p>即使检查同一个变量，放在刚产生错误的位置、放在输出之前，或者放在错误已经被覆盖之后，覆盖率与检测延迟也会不同</p>
+<h3 id="故障模型（Fault-Model）">故障模型（Fault Model）</h3>
+<p>检测对象限定为<strong>应用使用的数据值错误</strong>，可能来自硬件或软件两方面</p>
+<ul>
+<li><strong>硬件错误（Hardware Errors）</strong>：内存或逻辑电路中的瞬态错误（soft errors）导致错误计算，且未被 ECC 捕获；指令和程序逻辑中的许多错误也可能通过异常数据值表现出来</li>
+<li><strong>软件错误（Software Errors）</strong>：未初始化或错误初始化的变量、内存损坏、整数溢出，以及同步错误和竞态条件</li>
+</ul>
+<p>检测是否成功取决于错误值能否到达检测点，以及断言能否识别其异常。如果控制流错误绕过了检查，或直接把执行转移到程序之外，这类检测器就无法通过该检查发现错误，需要与控制流监测等机制配合</p>
+<h3 id="动态分析与静态分析的配合">动态分析与静态分析的配合</h3>
+<p>动态分析通过正常运行采集选定位置的变量值，归纳取值集合、范围和变化模式。静态分析则可以从检测点做后向切片，找出影响该变量的语句，并建立相应的符号关系</p>
+<p>实际断言类型包括</p>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>检查形式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>常量</td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mi>i</mi></msub><mo>=</mo><mi>c</mi></mrow><annotation encoding="application/x-tex">a_i=c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span></td>
+</tr>
+<tr>
+<td>交替值</td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><msub><mi>a</mi><mi>i</mi></msub><mo>=</mo><mi>x</mi><mo>∧</mo><msub><mi>a</mi><mrow><mi>i</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>=</mo><mi>y</mi><mo stretchy="false">)</mo><mo>∨</mo><mo stretchy="false">(</mo><msub><mi>a</mi><mi>i</mi></msub><mo>=</mo><mi>y</mi><mo>∧</mo><msub><mi>a</mi><mrow><mi>i</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>=</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(a_i=x\land a_{i-1}=y)\lor(a_i=y\land a_{i-1}=x)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.5556em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∧</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6389em;vertical-align:-0.2083em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∨</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.75em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∧</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6389em;vertical-align:-0.2083em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td>多值集合</td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mi>i</mi></msub><mo>∈</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">a_i\in V</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6891em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.22222em;">V</span></span></span></span></td>
+</tr>
+<tr>
+<td>范围</td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mo>≤</mo><msub><mi>a</mi><mi>i</mi></msub><mo>≤</mo><mi>u</mi></mrow><annotation encoding="application/x-tex">l\leq a_i\leq u</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8304em;vertical-align:-0.136em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.786em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">u</span></span></span></span></td>
+</tr>
+<tr>
+<td>固定差值</td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mi>i</mi></msub><mo>−</mo><msub><mi>a</mi><mrow><mi>i</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>=</mo><mi>c</mi></mrow><annotation encoding="application/x-tex">a_i-a_{i-1}=c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6389em;vertical-align:-0.2083em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span></td>
+</tr>
+<tr>
+<td>有界差值</td>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mo>≤</mo><msub><mi>a</mi><mi>i</mi></msub><mo>−</mo><msub><mi>a</mi><mrow><mi>i</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>≤</mo><mi>u</mi></mrow><annotation encoding="application/x-tex">l\leq a_i-a_{i-1}\leq u</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8304em;vertical-align:-0.136em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8443em;vertical-align:-0.2083em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">u</span></span></span></span></td>
+</tr>
+</tbody>
+</table></div>
+<p>还可以让多个线程或系统实体交叉检查它们对共享状态的认识，但交叉检查需要明确同步关系和观察时刻，否则读到不同版本的合法状态也可能引发告警</p>
+<h3 id="理想检测器与实际检测器">理想检测器与实际检测器</h3>
+<p>为了研究放置位置，可以先假设“理想检测器”：只要指定位置的变量值错误，它就能百分之百识别。这个假设把问题暂时集中到位置选择，而不是断言能否精确描述正确值</p>
+<p>在 gcc95 实验中，选择 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>10</mn></mrow><annotation encoding="application/x-tex">10</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">10</span></span></span></span> 个理想检测器可覆盖约 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>80</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">80\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">80%</span></span></span></span> 的崩溃和 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>60</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">60\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">60%</span></span></span></span> 的 silent data corruption，而对无害错误的检测约为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>4</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">4\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">4%</span></span></span></span>。随机在热点路径放置检测器，则需要约 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>100</mn></mrow><annotation encoding="application/x-tex">100</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">100</span></span></span></span> 个理想检测器才能达到约 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>90</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">90\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">90%</span></span></span></span> 的覆盖率</p>
+<p>这些数值说明位置选择的重要性，但不代表十条普通范围断言就能获得相同效果。使用实际断言后，课件给出的不同程序的已表现错误覆盖率约为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>50</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">50\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">50%</span></span></span></span> 至 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>75</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">75\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">75%</span></span></span></span>，效果受程序特征和断言表达能力影响</p>
+<p>检测器数量增加也可能带来更多误报。如果训练数据没有覆盖某种合法输入，对训练范围之外的正确状态就可能错误告警。因此断言部署需要同时观察错误覆盖和正常执行的接受情况</p>
+<h2 id="操作系统级检测：Reliability-Microkernel">操作系统级检测：Reliability Microkernel</h2>
+<p><strong>Reliability Microkernel（RMK）</strong> 是一个用于组织检测与恢复功能的操作系统内模块框架。这里的 microkernel 指可靠性机制的核心组织层，并不要求把整个操作系统改成微内核体系结构</p>
+<h3 id="Pin、Module-与-Core">Pin、Module 与 Core</h3>
+<p>RMK 把平台相关操作和检测策略分开：</p>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>部分</th>
+<th>职责</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pin</td>
+<td>封装底层硬件和系统服务，产生统一事件</td>
+<td>捕获上下文切换、接收异常或信号</td>
+</tr>
+<tr>
+<td>Module</td>
+<td>实现具体检测与恢复策略</td>
+<td>系统挂起检测、应用挂起检测</td>
+</tr>
+<tr>
+<td>Core</td>
+<td>管理 Pin 与 Module，分派事件和操作请求</td>
+<td>订阅事件、加载配置、动态部署与移除</td>
+</tr>
+</tbody>
+</table></div>
+<p>例如调度 Pin <code>P_SCHL</code> 捕获进程上下文切换，向模块发出 <code>EVT_CONTSWITCH</code> 事件，并提供安装与恢复拦截的操作。Linux 和 Windows 下的具体拦截方式不同，而上层模块尽量使用相同的事件接口</p>
+<p>这种分层让检测模块不必各自重新实现调度拦截和硬件计数器管理，也便于组合多个检测策略</p>
+<h2 id="SHD：用指令计数发现系统挂起">SHD：用指令计数发现系统挂起</h2>
+<p><strong>System Hang Detection（SHD）</strong> 关注内核长时间执行或等待、用户线程却无法推进的情形，例如内核无限循环或导致处理器无法正常交还给调度器的错误</p>
+<h3 id="用上下文切换建立进度界限">用上下文切换建立进度界限</h3>
+<p>在一定调度条件下，正常执行中相邻两次上下文切换之间的指令数量有一个可学习的上界。SHD 使用剖析计数器与检查计数器共同判断是否超出这个界限</p>
+<!-- Figure source: Session6-ErrorDetection_v3.pdf, page 48 -->
+<div class="tag-plugin image"><div class="image-bg"><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="/assets/reliability/4/system-hang-detection-counters.png" alt="系统挂起检测中的剖析计数器与检查计数器" data-fancybox="true" onerror="this.src=&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2rem' height='2rem' viewBox='0 0 24 24'%3E%3C!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --%3E%3Cpath fill='%23F44336' d='M22 12.698c-.002 1.47-.013 2.718-.096 3.743c-.097 1.19-.296 2.184-.74 3.009a4.2 4.2 0 0 1-.73.983c-.833.833-1.893 1.21-3.237 1.39C15.884 22 14.2 22 12.053 22h-.106c-2.148 0-3.83 0-5.144-.177c-1.343-.18-2.404-.557-3.236-1.39c-.738-.738-1.12-1.656-1.322-2.795c-.2-1.12-.236-2.512-.243-4.241Q1.999 12.737 2 12v-.054c0-2.148 0-3.83.177-5.144c.18-1.343.557-2.404 1.39-3.236s1.893-1.21 3.236-1.39c1.168-.157 2.67-.175 4.499-.177a.697.697 0 1 1 0 1.396c-1.855.002-3.234.018-4.313.163c-1.189.16-1.906.464-2.436.994S3.72 5.8 3.56 6.99C3.397 8.2 3.395 9.788 3.395 12v.784l.932-.814a2.14 2.14 0 0 1 2.922.097l3.99 3.99a1.86 1.86 0 0 0 2.385.207l.278-.195a2.79 2.79 0 0 1 3.471.209l2.633 2.37c.265-.557.423-1.288.507-2.32c.079-.972.09-2.152.091-3.63a.698.698 0 0 1 1.396 0' opacity='.5'/%3E%3Cpath fill='%23F44336' fill-rule='evenodd' d='M17.5 11c-2.121 0-3.182 0-3.841-.659S13 8.621 13 6.5s0-3.182.659-3.841S15.379 2 17.5 2s3.182 0 3.841.659S22 4.379 22 6.5s0 3.182-.659 3.841S19.621 11 17.5 11m-1.47-7.03a.75.75 0 1 0-1.06 1.06l1.47 1.47l-1.47 1.47a.75.75 0 0 0 1.06 1.06l1.47-1.47l1.47 1.47a.75.75 0 1 0 1.06-1.06L18.56 6.5l1.47-1.47a.75.75 0 0 0-1.06-1.06L17.5 5.44z' clip-rule='evenodd'/%3E%3C/svg%3E&quot;"><div class="lazy-icon"></div></div><div class="image-meta"><span class="image-caption center">系统挂起检测中的剖析计数器与检查计数器</span></div></div>
+<p>虚线的 <strong>profiling counter</strong> 在相邻切换之间累计指令数，为检查阈值提供依据；实线的 <strong>checking counter</strong> 从阈值递减。若迟迟没有正常切换，计数器耗尽就触发 NMI，报告疑似挂起</p>
+<p>与固定墙钟超时相比，指令数量更直接反映处理器执行进度，但效果仍取决于工作负载、调度策略和阈值是否匹配</p>
+<p>NMI 提供了一条不同于普通可屏蔽中断的进入路径，有助于在部分内核异常状态下触发检测。它也不是对任意硬件失效都有效的万能入口</p>
+<h3 id="实验结果怎样读">实验结果怎样读</h3>
+<p>在设备驱动调用场景中向内核代码内存注入错误，共执行 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1346</mn></mrow><annotation encoding="application/x-tex">1346</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1346</span></span></span></span> 次实验。按最先观察到的结果分类如下：</p>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>最先观察到的表现</th>
+<th style="text-align:right">实验数</th>
+<th style="text-align:right">后续出现挂起的次数</th>
+<th style="text-align:right">检测到的挂起</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>正确输出</td>
+<td style="text-align:right">391</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">1</td>
+</tr>
+<tr>
+<td>静默错误输出</td>
+<td style="text-align:right">380</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td>内核异常</td>
+<td style="text-align:right">485</td>
+<td style="text-align:right">30</td>
+<td style="text-align:right">30</td>
+</tr>
+<tr>
+<td>silent hang</td>
+<td style="text-align:right">90</td>
+<td style="text-align:right">90</td>
+<td style="text-align:right">90</td>
+</tr>
+</tbody>
+</table></div>
+<p>其中 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>121</mn></mrow><annotation encoding="application/x-tex">121</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">121</span></span></span></span> 次挂起均被检测到，实验中没有观察到误报。不能把这个结论写成“检测到了全部 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1346</mn></mrow><annotation encoding="application/x-tex">1346</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1346</span></span></span></span> 次注入错误”，因为 SHD 的目标是挂起，而不是任意错误输出</p>
+<p>“先有正确输出或内核异常，后有系统挂起”还说明，错误可以继续传播，第一次可见结果不是事件链的终点。包括空指针访问进入异常处理后再次出错，以及锁未释放使系统继续停滞</p>
+<h2 id="AHD：把挂起检测细化到线程与代码区段">AHD：把挂起检测细化到线程与代码区段</h2>
+<p>系统仍然可以调度，并不代表某个应用线程没有死锁或陷入循环。<strong>Application Hang Detection（AHD）</strong> 进一步监视函数、循环、循环迭代或互斥区段</p>
+<p>它通过硬件计数器统计线程实际执行的指令，并为每个“线程—受监控区段”维护逻辑计数器。如果未离开区段就超过了预期指令数量，则怀疑发生挂起</p>
+<h3 id="一个硬件计数器怎样服务多个逻辑区段">一个硬件计数器怎样服务多个逻辑区段</h3>
+<p>基本组织方式是</p>
+<ol>
+<li>线程切换时，读出上一时间片执行的指令数，累计到该线程所有活跃区段</li>
+<li>进入区段时，记录当前硬件计数器基值，并标记区段活跃</li>
+<li>离开区段时，结算指令数、记录历史并清除活跃标志</li>
+<li>根据历史行为更新检查阈值，之后继续检测</li>
+</ol>
+<p>通过基值和逻辑计数器，计数可以跨时间片累计，并处理一个线程中多个同时活跃的受监控区段。将其他线程的指令错误累计进去，会直接破坏检测结果</p>
+<h3 id="阻塞线程还需要时间检查">阻塞线程还需要时间检查</h3>
+<p>若线程阻塞在锁上，它本身可能几乎不再执行指令，单纯依赖指令数就不会越过阈值。因此还周期性检查带有活跃区段的线程时间戳：如果长时间没有推进，同样报告挂起</p>
+<p>这体现了两种进度信号的互补：指令计数有助于识别“持续执行但不退出”，时间检查则覆盖“停止执行却一直不完成”</p>
+<p>可以在 Apache 上评估该机制：<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1206</mn></mrow><annotation encoding="application/x-tex">1206</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1206</span></span></span></span> 次人工挂起注入均被检测；<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1861</mn></mrow><annotation encoding="application/x-tex">1861</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1861</span></span></span></span> 次目标代码比特翻转实验中，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1854</mn></mrow><annotation encoding="application/x-tex">1854</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1854</span></span></span></span> 次表现为崩溃、<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>7</mn></mrow><annotation encoding="application/x-tex">7</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">7</span></span></span></span> 次表现为被检测到的挂起；<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2000</mn></mrow><annotation encoding="application/x-tex">2000</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2000</span></span></span></span> 次无故障注入实验中出现 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn></mrow><annotation encoding="application/x-tex">1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 次挂起告警。最后一组对应按实验次数计约 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.05</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">0.05\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">0.05%</span></span></span></span> 的误报，这些结果限定于该原型和测试条件</p>
+<h2 id="Count-Check：检测合法但错误的路径">Count&amp;Check：检测合法但错误的路径</h2>
+<p>控制流错误不一定表现为跳到非法地址。软件缺陷或错误输入可能使程序走上一条在源代码中完全存在、但当前语义下不应该选择的路径</p>
+<p>例如表大小意外变成零后，初始化分支被跳过，程序继续使用未初始化的数据。每次跳转都可能满足控制流图的边约束，传统非法分支检查却无法据此判断结果正确与否</p>
+<p><strong>Count&amp;Check（C&amp;C）</strong> 尝试用正常执行中观察到的函数事件与指令数量，进一步区分这些路径</p>
+<h3 id="签名加入了指令数量">签名加入了指令数量</h3>
+<p>一个示意签名可以写成</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sort() entry --22 instructions--&gt; memcpy() entry</span><br><span class="line">sort() entry --19 instructions--&gt; malloc() entry</span><br></pre></td></tr></tbody></table></figure>
+<p>这里的数字是特定编译结果与实验环境下的指令计数，不是算法本身固定的常数</p>
+<p>如果程序跳过分配或初始化，但仍然调用相同的后续函数，函数调用序列未必变化，两个事件之间的指令数量却可能不同。把它加入签名，就有机会发现只有调用序列看不见的异常</p>
+<p>对不同代码结构，指令数量呈现不同模式：顺序代码通常固定，分支可以形成不同的离散计数，循环与迭代次数相关，函数成功和失败的执行路径也可能具有不同范围</p>
+<h3 id="训练与运行时检查">训练与运行时检查</h3>
+<p>训练阶段使用正常输入执行程序，提取函数事件序列与计数模式。运行时再把观察到的特征与签名集比较。一种方案使用二进制重写插桩和硬件性能计数器，并在系统调用等检查点检验执行路径</p>
+<p>其基本假设是错误行为通常会改变这些特征，但这种改变并不必然发生。错误若只影响与路径无关的数据，或者错误分支恰好与另一种正常执行具有相同签名，就可能漏检</p>
+<p>训练也有两个方向的风险：</p>
+<ul>
+<li>合法路径未被训练覆盖，会在运行时产生误报</li>
+<li>训练把错误路径当作正常行为接受，会导致后续漏报</li>
+</ul>
+<p>改进方法包括覆盖更多预期输入类别、按函数训练、人工确认异常路径，以及注入已知错误来辨别正常与错误模式</p>
+<h3 id="覆盖率实验中的分母">覆盖率实验中的分母</h3>
+<p>在 SimpleScalar 原型上评估 Siemens 测试程序，向函数参数和返回值注入比特翻转。两组正常执行检查的误报数分别为 Replace 的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>4</mn><mi mathvariant="normal">/</mi><mn>300</mn></mrow><annotation encoding="application/x-tex">4/300</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">4/300</span></span></span></span> 和 Tot_info 的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>4</mn><mi mathvariant="normal">/</mi><mn>200</mn></mrow><annotation encoding="application/x-tex">4/200</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">4/200</span></span></span></span>，对应约 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1.3</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">1.3\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">1.3%</span></span></span></span> 和 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">2\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">2%</span></span></span></span>；Schedule2 的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>300</mn></mrow><annotation encoding="application/x-tex">300</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">300</span></span></span></span> 次检查中没有误报</p>
+<p>错误检测实验中，Replace 的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>72</mn></mrow><annotation encoding="application/x-tex">72</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">72</span></span></span></span> 个已表现错误中检测到 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>66</mn></mrow><annotation encoding="application/x-tex">66</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">66</span></span></span></span> 个，覆盖率约为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>91.7</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">91.7\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">91.7%</span></span></span></span>；Tot_info 的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>56</mn></mrow><annotation encoding="application/x-tex">56</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">56</span></span></span></span> 个已表现错误中检测到 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>47</mn></mrow><annotation encoding="application/x-tex">47</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">47</span></span></span></span> 个，约为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>83.9</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">83.9\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">83.9%</span></span></span></span></p>
+<p>Schedule2 的统计尤其容易误读：比如 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>145</mn></mrow><annotation encoding="application/x-tex">145</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">145</span></span></span></span> 个已表现错误，却有 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>151</mn></mrow><annotation encoding="application/x-tex">151</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">151</span></span></span></span> 个检测结果，并报告对已表现错误的覆盖率为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>100</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">100\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">100%</span></span></span></span>。原因是检测器还发现了没有改变最终输出、但改变内部状态的错误，不能直接用 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>151</mn><mi mathvariant="normal">/</mi><mn>145</mn></mrow><annotation encoding="application/x-tex">151/145</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">151/145</span></span></span></span> 作为覆盖率</p>
+<p>还有许多已激活错误没有表现为外部错误。例如程序只检查返回值是否非零，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn></mrow><annotation encoding="application/x-tex">1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 被翻转成 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn><mi>x</mi><mn>11</mn></mrow><annotation encoding="application/x-tex">0x11</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span><span class="mord mathnormal">x</span><span class="mord">11</span></span></span></span> 后仍满足成功分支。这样的语义屏蔽说明，注入次数、激活次数和已表现错误数之间可能相差很大</p>
+<h3 id="Apache-配置错误案例">Apache 配置错误案例</h3>
+<p>接下来展示了一条业务层面的传播链：配置项本应控制最大空闲 HTTP 服务进程数，却接收到非数字字符串；程序通过 <code>atoi()</code> 得到零值后没有正确检查，导致一个线程周期性清理空闲服务进程，另一个线程又因进程不足不断创建进程，最终服务行为不稳定</p>
+<p>C&amp;C 利用非数字输入在转换函数中执行的指令较少这一差异发现异常。这个案例说明，检测信号可以出现在最终服务失效之前的底层函数中，进而辅助定位配置处理缺陷</p>
+<h2 id="从宿主系统扩展到虚拟机">从宿主系统扩展到虚拟机</h2>
+<p>最后，将 RMK 扩展到虚拟化场景：一部分机制放在受保护虚拟机中的设备驱动里，另一部分放在 Hypervisor 中，通过接口协同观察虚拟机和内部应用</p>
+<p>崩溃检测可以在 Hypervisor 层捕获虚拟机及其应用相关的崩溃信号；挂起检测则结合客户机调度事件和 Hypervisor 调度事件，检查虚拟机的执行进展</p>
+<p>这里计数范围非常重要：虚拟机被换出期间，其他虚拟机消耗的指令不应该算到它头上。判断“长期没有进展”时，也需要区分客户机已经得到 CPU 却不推进，与宿主根本没有调度它运行</p>
+<p>把检测器放在更低层可以提供额外观察视角，但上层业务是否正确仍需要应用信息。虚拟机仍在执行指令，不代表它正在完成有用工作</p>
+<h2 id="怎样组合这些检测机制">怎样组合这些检测机制</h2>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>机制</th>
+<th>主要观察对象</th>
+<th>典型覆盖范围</th>
+<th>需要补充的观察</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>watchdog</td>
+<td>重置动作与期限</td>
+<td>未到达进度点、长时间停滞</td>
+<td>数据与输出正确性</td>
+</tr>
+<tr>
+<td>heartbeat</td>
+<td>节点或进程响应</td>
+<td>无响应、通信异常</td>
+<td>业务线程和依赖服务状态</td>
+</tr>
+<tr>
+<td>Capability Checking 与 Consistency Checking</td>
+<td>操作权限、地址和数值约束</td>
+<td>越权、非法值、部分算术异常</td>
+<td>合法范围内的语义错误</td>
+</tr>
+<tr>
+<td>Data Audits</td>
+<td>数据内容、布局和引用关系</td>
+<td>数据损坏、孤立记录、资源泄漏</td>
+<td>与业务更新一致的检查时刻</td>
+</tr>
+<tr>
+<td>控制流签名与 PECOS</td>
+<td>事件路径、跳转目标</td>
+<td>非法路径或非法目标</td>
+<td>合法但语义错误的选择</td>
+</tr>
+<tr>
+<td>应用感知断言</td>
+<td>关键变量及其关系</td>
+<td>经过检测点的数据异常</td>
+<td>断言表达能力和位置覆盖</td>
+</tr>
+<tr>
+<td>SHD / AHD</td>
+<td>调度进展、区段指令数和时间戳</td>
+<td>系统或应用挂起</td>
+<td>未挂起的错误输出</td>
+</tr>
+<tr>
+<td>Count&amp;Check</td>
+<td>函数事件与指令数量模式</td>
+<td>部分非法路径及合法但错误的路径</td>
+<td>签名不变的数据错误</td>
+</tr>
+</tbody>
+</table></div>
+<p>选择检测机制时，应先确定故障模型、服务边界和错误传播路径，再安排检测点与恢复动作。时间、数据、控制流和调度进展提供的是不同证据，组合使用有助于覆盖单一机制看不见的错误</p>
+<p>验证时则需要同时报告目标错误覆盖率、误报、检测延迟和开销，并保留故障注入与工作负载条件。只有把这些条件写清，才能判断一个检测器能否在当前系统中及时阻止错误传播，或者有效缩短恢复时间</p>
+</article>
+<div class="article-footer slide-up">
+    <section id="license">
+      <div class="header"><span>许可协议</span></div>
+      <div class="body"><p>本文采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">署名-非商业性使用-相同方式共享 4.0 国际</a> 许可协议，转载请注明出处。</p>
+</div>
+    </section>
+    
+
+</div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">回顾上一篇</div><a href="/notes/reliability/ch03-techniques/">可靠计算系统 - 可靠性技术总览</a></div><div class="item" id="next"><div class="note">接下来阅读</div><a href="/notes/reliability/ch05-fault-injection/">可靠计算系统 - 故障注入与实验验证</a></div></section></div>
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>快来参与讨论吧~</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<div class="lazy-icon"></div>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="renxiaodaifu/blog-comments" data-repo-id="R_kgDOPn1NdA" data-category="Announcements" data-category-id="DIC_kwDOPn1NdM4Cu1mk" data-mapping="url" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="https://cdn.jsdelivr.net/gh/L33Z22L11/giscus-theme/lxgw-wenkai.css" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="text"><center>
+<span>
+© 2024
+本网站由 <a style="font-weight: bold;  auto;" target="_blank" rel="noopener" href="https://github.com/renxiaodaifu">renxiaodaifu</a>
+使用 <a style="font-weight: bold;  auto;" target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a>主题
+创建
+</span>
+<br>
+<!--不蒜子计数器-->
+<script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<!--添加一个访问量-->
+<span>总访问 <span id="busuanzi_value_site_pv" style="font-weight: bold;"></span> 次 | 本页访问 <span id="busuanzi_value_page_pv" style="font-weight: bold;"></span> 次</span> 
+</br>
+<span id="runtime_span"></span>
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+    var runtime_span = document.getElementById('runtime_span');
+    
+    function show_runtime() {
+      // 调用定时器
+      setTimeout(show_runtime, 1000);
+    
+      var seconds = 1000;
+      var minutes = seconds * 60;
+      var hours = minutes * 60;
+      var days = hours * 24;
+      var years = days * 365;
+    
+      var today = new Date();
+      var todayYear = today.getFullYear();
+      var todayMonth = today.getMonth();
+      var todayDate = today.getDate();
+      var todayHour = today.getHours();
+      var todayMinute = today.getMinutes();
+      var todaySecond = today.getSeconds();
+    
+      var t1 = Date.UTC(2024, 4, 7, 20, 59, 11); // UTC时间，月份从0开始
+      var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+      var diff = t2 - t1;
+    
+      var diffYears = Math.floor(diff / years);
+      var diffDays = Math.floor((diff / days) - diffYears * 365);
+      var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+      var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) / minutes);
+      var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours - diffMinutes * minutes) / seconds);
+    
+      // 更新显示时间的span元素内容
+      runtime_span.innerHTML = "🦉营业：" + diffYears + " 年 " + diffDays + " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒🦉";
+    }
+    
+    show_runtime(); // 初次调用函数以启动定时器
+  });
+</script>
+<br>
+<span class="totalcount">共 12 篇博客 · 共 89 篇 wiki · 总计 31.8k 字</span>
+</center>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right" data-ui-surface="sidebar"><div class="widgets">
+
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false">
+  
+    <div class="widget-header dis-select">
+      <span class="name">本文目录</span>
+      <a class="cap-action" onclick="sidebar.toggleTOC()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a>
+    </div>
+  
+  <div class="widget-body"><ol class="toc ui-collection-adapter"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%8E%E6%A0%B7%E8%AF%84%E4%BB%B7%E4%B8%80%E4%B8%AA%E9%94%99%E8%AF%AF%E6%A3%80%E6%B5%8B%E5%99%A8"><span class="toc-text">怎样评价一个错误检测器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A3%80%E6%B5%8B%E5%BF%85%E9%A1%BB%E4%B8%8E%E6%81%A2%E5%A4%8D%E8%A1%94%E6%8E%A5"><span class="toc-text">检测必须与恢复衔接</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#watchdog%EF%BC%9A%E6%98%AF%E5%90%A6%E5%9C%A8%E6%9C%9F%E9%99%90%E5%86%85%E5%AE%8C%E6%88%90%E4%BA%86%E8%BF%9B%E5%BA%A6"><span class="toc-text">watchdog：是否在期限内完成了进度</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%8D%E7%BD%AE%E7%82%B9%E6%94%BE%E5%9C%A8%E5%93%AA%E9%87%8C%E5%BE%88%E5%85%B3%E9%94%AE"><span class="toc-text">重置点放在哪里很关键</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%83%E4%B8%BB%E8%A6%81%E6%94%B9%E5%96%84%E5%93%AA%E4%B8%80%E4%B8%AA%E6%8C%87%E6%A0%87"><span class="toc-text">它主要改善哪一个指标</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#heartbeat%EF%BC%9A%E4%BB%8E%E6%9C%AC%E6%9C%BA%E8%BF%9B%E5%BA%A6%E6%89%A9%E5%B1%95%E5%88%B0%E5%88%86%E5%B8%83%E5%BC%8F%E5%93%8D%E5%BA%94"><span class="toc-text">heartbeat：从本机进度扩展到分布式响应</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Adaptive-Heartbeat-%E4%B8%8E-Smart-Heartbeat-%E8%A7%A3%E5%86%B3%E4%B8%8D%E5%90%8C%E9%97%AE%E9%A2%98"><span class="toc-text">Adaptive Heartbeat 与 Smart Heartbeat 解决不同问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Capability-Checking-%E4%B8%8E-Consistency-Checking"><span class="toc-text">Capability Checking 与 Consistency Checking</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%EF%BC%9A%E6%8A%8A%E7%A1%AC%E4%BB%B6%E5%8F%91%E7%8E%B0%E7%9A%84%E5%BC%82%E5%B8%B8%E4%BA%A4%E7%BB%99%E8%BD%AF%E4%BB%B6"><span class="toc-text">异常处理：把硬件发现的异常交给软件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Fault%E3%80%81Trap-%E4%B8%8E-Abort"><span class="toc-text">Fault、Trap 与 Abort</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%BA%E9%A1%B5%E4%B8%8D%E4%B8%80%E5%AE%9A%E6%84%8F%E5%91%B3%E7%9D%80%E7%A8%8B%E5%BA%8F%E5%87%BA%E9%94%99"><span class="toc-text">缺页不一定意味着程序出错</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A1%AC%E4%BB%B6%E5%92%8C%E8%BD%AF%E4%BB%B6%E6%80%8E%E6%A0%B7%E8%A1%94%E6%8E%A5"><span class="toc-text">硬件和软件怎样衔接</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Data-Audits%EF%BC%9A%E4%BB%8E%E6%95%B0%E5%80%BC%E5%90%88%E6%B3%95%E5%88%B0%E4%B8%9A%E5%8A%A1%E5%85%B3%E7%B3%BB%E4%B8%80%E8%87%B4"><span class="toc-text">Data Audits：从数值合法到业务关系一致</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9D%99%E6%80%81%E6%95%B0%E6%8D%AE%E4%B8%8E%E5%8A%A8%E6%80%81%E6%95%B0%E6%8D%AE"><span class="toc-text">静态数据与动态数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Structural-Audit"><span class="toc-text">Structural Audit</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Semantic-Referential-Integrity-Check"><span class="toc-text">Semantic Referential Integrity Check</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8E%A7%E5%88%B6%E6%B5%81%E7%9B%91%E6%B5%8B%EF%BC%9A%E7%A8%8B%E5%BA%8F%E6%98%AF%E5%90%A6%E6%8C%89%E5%85%81%E8%AE%B8%E7%9A%84%E8%B7%AF%E5%BE%84%E6%89%A7%E8%A1%8C"><span class="toc-text">控制流监测：程序是否按允许的路径执行</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A1%AC%E4%BB%B6%E4%B8%8E%E8%BD%AF%E4%BB%B6%E4%B8%A4%E7%A7%8D%E7%BB%84%E7%BB%87%E6%96%B9%E5%BC%8F"><span class="toc-text">硬件与软件两种组织方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B7%AF%E5%BE%84%E7%AD%BE%E5%90%8D%E6%80%8E%E6%A0%B7%E8%A1%A8%E7%A4%BA%E6%89%A7%E8%A1%8C"><span class="toc-text">路径签名怎样表示执行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%9C%A8%E8%B7%B3%E8%BD%AC%E5%89%8D%E6%A3%80%E6%9F%A5"><span class="toc-text">为什么要在跳转前检查</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E6%84%9F%E7%9F%A5%E9%94%99%E8%AF%AF%E6%A3%80%E6%B5%8B%EF%BC%88Application-Aware-Error-Detection%EF%BC%89"><span class="toc-text">应用感知错误检测（Application-Aware Error Detection）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%85%E9%9A%9C%E6%A8%A1%E5%9E%8B%EF%BC%88Fault-Model%EF%BC%89"><span class="toc-text">故障模型（Fault Model）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A8%E6%80%81%E5%88%86%E6%9E%90%E4%B8%8E%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%E7%9A%84%E9%85%8D%E5%90%88"><span class="toc-text">动态分析与静态分析的配合</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%90%86%E6%83%B3%E6%A3%80%E6%B5%8B%E5%99%A8%E4%B8%8E%E5%AE%9E%E9%99%85%E6%A3%80%E6%B5%8B%E5%99%A8"><span class="toc-text">理想检测器与实际检测器</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%BA%A7%E6%A3%80%E6%B5%8B%EF%BC%9AReliability-Microkernel"><span class="toc-text">操作系统级检测：Reliability Microkernel</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Pin%E3%80%81Module-%E4%B8%8E-Core"><span class="toc-text">Pin、Module 与 Core</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SHD%EF%BC%9A%E7%94%A8%E6%8C%87%E4%BB%A4%E8%AE%A1%E6%95%B0%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F%E6%8C%82%E8%B5%B7"><span class="toc-text">SHD：用指令计数发现系统挂起</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%87%E6%8D%A2%E5%BB%BA%E7%AB%8B%E8%BF%9B%E5%BA%A6%E7%95%8C%E9%99%90"><span class="toc-text">用上下文切换建立进度界限</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C%E6%80%8E%E6%A0%B7%E8%AF%BB"><span class="toc-text">实验结果怎样读</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AHD%EF%BC%9A%E6%8A%8A%E6%8C%82%E8%B5%B7%E6%A3%80%E6%B5%8B%E7%BB%86%E5%8C%96%E5%88%B0%E7%BA%BF%E7%A8%8B%E4%B8%8E%E4%BB%A3%E7%A0%81%E5%8C%BA%E6%AE%B5"><span class="toc-text">AHD：把挂起检测细化到线程与代码区段</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E4%B8%AA%E7%A1%AC%E4%BB%B6%E8%AE%A1%E6%95%B0%E5%99%A8%E6%80%8E%E6%A0%B7%E6%9C%8D%E5%8A%A1%E5%A4%9A%E4%B8%AA%E9%80%BB%E8%BE%91%E5%8C%BA%E6%AE%B5"><span class="toc-text">一个硬件计数器怎样服务多个逻辑区段</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%98%BB%E5%A1%9E%E7%BA%BF%E7%A8%8B%E8%BF%98%E9%9C%80%E8%A6%81%E6%97%B6%E9%97%B4%E6%A3%80%E6%9F%A5"><span class="toc-text">阻塞线程还需要时间检查</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Count-Check%EF%BC%9A%E6%A3%80%E6%B5%8B%E5%90%88%E6%B3%95%E4%BD%86%E9%94%99%E8%AF%AF%E7%9A%84%E8%B7%AF%E5%BE%84"><span class="toc-text">Count&amp;Check：检测合法但错误的路径</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AD%BE%E5%90%8D%E5%8A%A0%E5%85%A5%E4%BA%86%E6%8C%87%E4%BB%A4%E6%95%B0%E9%87%8F"><span class="toc-text">签名加入了指令数量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%AD%E7%BB%83%E4%B8%8E%E8%BF%90%E8%A1%8C%E6%97%B6%E6%A3%80%E6%9F%A5"><span class="toc-text">训练与运行时检查</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A6%86%E7%9B%96%E7%8E%87%E5%AE%9E%E9%AA%8C%E4%B8%AD%E7%9A%84%E5%88%86%E6%AF%8D"><span class="toc-text">覆盖率实验中的分母</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Apache-%E9%85%8D%E7%BD%AE%E9%94%99%E8%AF%AF%E6%A1%88%E4%BE%8B"><span class="toc-text">Apache 配置错误案例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%8E%E5%AE%BF%E4%B8%BB%E7%B3%BB%E7%BB%9F%E6%89%A9%E5%B1%95%E5%88%B0%E8%99%9A%E6%8B%9F%E6%9C%BA"><span class="toc-text">从宿主系统扩展到虚拟机</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%8E%E6%A0%B7%E7%BB%84%E5%90%88%E8%BF%99%E4%BA%9B%E6%A3%80%E6%B5%8B%E6%9C%BA%E5%88%B6"><span class="toc-text">怎样组合这些检测机制</span></a></li></ol></div>
+  <div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="currentColor" fill-rule="evenodd" d="M11.9426 1.25H12.0574C14.3658 1.24999 16.1748 1.24998 17.5863 1.43975C19.031 1.63399 20.1711 2.03933 21.0659 2.93414C21.9607 3.82895 22.366 4.96897 22.5603 6.41371C22.75 7.82519 22.75 9.63423 22.75 11.9426V12.0574C22.75 14.3658 22.75 16.1748 22.5603 17.5863C22.366 19.031 21.9607 20.1711 21.0659 21.0659C20.1711 21.9607 19.031 22.366 17.5863 22.5603C16.1748 22.75 14.3658 22.75 12.0574 22.75H11.9426C9.63423 22.75 7.82519 22.75 6.41371 22.5603C4.96897 22.366 3.82895 21.9607 2.93414 21.0659C2.03933 20.1711 1.63399 19.031 1.43975 17.5863C1.24998 16.1748 1.24999 14.3658 1.25 12.0574V11.9426C1.24999 9.63423 1.24998 7.82519 1.43975 6.41371C1.63399 4.96897 2.03933 3.82895 2.93414 2.93414C3.82895 2.03933 4.96897 1.63399 6.41371 1.43975C7.82519 1.24998 9.63423 1.24999 11.9426 1.25ZM6.61358 2.92637C5.33517 3.09825 4.56445 3.42514 3.9948 3.9948C3.42514 4.56445 3.09825 5.33517 2.92637 6.61358C2.75159 7.91356 2.75 9.62177 2.75 12C2.75 14.3782 2.75159 16.0864 2.92637 17.3864C3.09825 18.6648 3.42514 19.4355 3.9948 20.0052C4.56445 20.5749 5.33517 20.9018 6.61358 21.0736C7.91356 21.2484 9.62177 21.25 12 21.25C14.3782 21.25 16.0864 21.2484 17.3864 21.0736C18.6648 20.9018 19.4355 20.5749 20.0052 20.0052C20.5749 19.4355 20.9018 18.6648 21.0736 17.3864C21.2484 16.0864 21.25 14.3782 21.25 12C21.25 9.62177 21.2484 7.91356 21.0736 6.61358C20.9018 5.33517 20.5749 4.56445 20.0052 3.9948C19.4355 3.42514 18.6648 3.09825 17.3864 2.92637C16.0864 2.75159 14.3782 2.75 12 2.75C9.62177 2.75 7.91356 2.75159 6.61358 2.92637ZM12 9.56066L9.53033 12.0303C9.23744 12.3232 8.76256 12.3232 8.46967 12.0303C8.17678 11.7374 8.17678 11.2626 8.46967 10.9697L11.4697 7.96967C11.7626 7.67678 12.2374 7.67678 12.5303 7.96967L15.5303 10.9697C15.8232 11.2626 15.8232 11.7374 15.5303 12.0303C15.2374 12.3232 14.7626 12.3232 14.4697 12.0303L12 9.56066ZM12 13.5607L9.53033 16.0303C9.23744 16.3232 8.76256 16.3232 8.46967 16.0303C8.17678 15.7374 8.17678 15.2626 8.46967 14.9697L11.4697 11.9697C11.7626 11.6768 12.2374 11.6768 12.5303 11.9697L15.5303 14.9697C15.8232 15.2626 15.8232 15.7374 15.5303 16.0303C15.2374 16.3232 14.7626 16.3232 14.4697 16.0303L12 13.5607Z" clip-rule="evenodd"/></svg><span>回到顶部</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="currentColor" fill-rule="evenodd" d="M10.4606 1.25H13.5394C15.1427 1.24999 16.3997 1.24999 17.4039 1.34547C18.4274 1.44279 19.2655 1.64457 20.0044 2.09732C20.7781 2.57144 21.4286 3.22194 21.9027 3.99563C22.3554 4.73445 22.5572 5.57256 22.6545 6.59611C22.75 7.60029 22.75 8.85725 22.75 10.4606V11.5278C22.75 12.6691 22.75 13.564 22.7007 14.2868C22.6505 15.0223 22.5468 15.6344 22.3123 16.2004C21.7287 17.6093 20.6093 18.7287 19.2004 19.3123C18.3955 19.6457 17.4786 19.7197 16.2233 19.7413C15.7842 19.7489 15.5061 19.7545 15.2941 19.7779C15.096 19.7999 15.0192 19.832 14.9742 19.8582C14.9268 19.8857 14.8622 19.936 14.7501 20.0898C14.6287 20.2564 14.4916 20.4865 14.2742 20.8539L13.7321 21.7697C12.9585 23.0767 11.0415 23.0767 10.2679 21.7697L9.72579 20.8539C9.50835 20.4865 9.37122 20.2564 9.24985 20.0898C9.13772 19.936 9.07313 19.8857 9.02572 19.8582C8.98078 19.832 8.90399 19.7999 8.70588 19.7779C8.49387 19.7545 8.21575 19.7489 7.77666 19.7413C6.52138 19.7197 5.60454 19.6457 4.79957 19.3123C3.39066 18.7287 2.27128 17.6093 1.68769 16.2004C1.45323 15.6344 1.3495 15.0223 1.29932 14.2868C1.24999 13.564 1.25 12.6691 1.25 11.5278L1.25 10.4606C1.24999 8.85726 1.24999 7.60029 1.34547 6.59611C1.44279 5.57256 1.64457 4.73445 2.09732 3.99563C2.57144 3.22194 3.22194 2.57144 3.99563 2.09732C4.73445 1.64457 5.57256 1.44279 6.59611 1.34547C7.60029 1.24999 8.85726 1.24999 10.4606 1.25ZM6.73809 2.83873C5.82434 2.92561 5.24291 3.09223 4.77938 3.37628C4.20752 3.72672 3.72672 4.20752 3.37628 4.77938C3.09223 5.24291 2.92561 5.82434 2.83873 6.73809C2.75079 7.663 2.75 8.84876 2.75 10.5V11.5C2.75 12.6751 2.75041 13.5189 2.79584 14.1847C2.84081 14.8438 2.92737 15.2736 3.07351 15.6264C3.50486 16.6678 4.33223 17.4951 5.3736 17.9265C5.88923 18.1401 6.54706 18.2199 7.8025 18.2416L7.83432 18.2421C8.23232 18.249 8.58109 18.2549 8.87097 18.287C9.18246 18.3215 9.4871 18.3912 9.77986 18.5615C10.0702 18.7304 10.2795 18.9559 10.4621 19.2063C10.6307 19.4378 10.804 19.7306 11.0004 20.0623L11.5587 21.0057C11.7515 21.3313 12.2485 21.3313 12.4412 21.0057L12.9996 20.0623C13.1959 19.7306 13.3692 19.4378 13.5379 19.2063C13.7204 18.9559 13.9298 18.7304 14.2201 18.5615C14.5129 18.3912 14.8175 18.3215 15.129 18.287C15.4189 18.2549 15.7676 18.249 16.1656 18.2421L16.1975 18.2416C17.4529 18.2199 18.1108 18.1401 18.6264 17.9265C19.6678 17.4951 20.4951 16.6678 20.9265 15.6264C21.0726 15.2736 21.1592 14.8438 21.2042 14.1847C21.2496 13.5189 21.25 12.6751 21.25 11.5V10.5C21.25 8.84876 21.2492 7.663 21.1613 6.73809C21.0744 5.82434 20.9078 5.24291 20.6237 4.77938C20.2733 4.20752 19.7925 3.72672 19.2206 3.37628C18.7571 3.09223 18.1757 2.92561 17.2619 2.83873C16.337 2.75079 15.1512 2.75 13.5 2.75H10.5C8.84876 2.75 7.663 2.75079 6.73809 2.83873ZM7.25 9C7.25 8.58579 7.58579 8.25 8 8.25H16C16.4142 8.25 16.75 8.58579 16.75 9C16.75 9.41421 16.4142 9.75 16 9.75H8C7.58579 9.75 7.25 9.41421 7.25 9ZM7.25 12.5C7.25 12.0858 7.58579 11.75 8 11.75H13.5C13.9142 11.75 14.25 12.0858 14.25 12.5C14.25 12.9142 13.9142 13.25 13.5 13.25H8C7.58579 13.25 7.25 12.9142 7.25 12.5Z" clip-rule="evenodd"/></svg><span>参与讨论</span></a></div>
+</widget>
+
+
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://ywang.top/notes/reliability/ch04-error-detection/","checklink":"/js/plugins/video.js"};
+  // Fix: Ensure page is at the correct top position on data load
+  if (history.scrollRestoration) {
+    history.scrollRestoration = 'auto';
+  }
+  (function() {
+    const scrollHandler = () => {
+      // 存在有效锚点时，等待布局稳定后滚动到目标
+      // （浏览器原生锚点滚动发生在布局完成前，长文章的懒加载图片/异步组件会把目标顶偏）
+      const hash = window.location.hash;
+      if (hash.length > 1) {
+        let anchorId = hash.slice(1);
+        try {
+          anchorId = decodeURIComponent(anchorId);
+        } catch (e) {
+          // 片段含非法编码时按原样查找
+        }
+        const anchor = document.getElementById(anchorId);
+        if (anchor) {
+          // #start 锚点贴顶，不预留 offset；其余锚点与 TOC 点击滚动保持一致
+          const offset = anchorId === 'start' ? 0 : 32;
+          const targetY = () => anchor.getBoundingClientRect().top + window.scrollY - offset;
+          let timer = null;
+          let lastY = null;
+          let quiet = 0;
+          let attempts = 0;
+          // 记录最近一次资源加载完成时间，判断异步数据/图片是否仍在改变布局
+          let lastResourceTime = performance.now();
+          let observer = null;
+          try {
+            observer = new PerformanceObserver(function (list) {
+              lastResourceTime = performance.now();
+            });
+            observer.observe({ entryTypes: ['resource'] });
+          } catch (e) {}
+          // 统计进行中的 fetch/XHR 请求，异步组件（timeline 等）未完成前不判定布局稳定
+          let pendingRequests = 0;
+          const trackRequest = (fn) => {
+            pendingRequests++;
+            try {
+              const result = fn();
+              if (result && typeof result.finally === 'function') {
+                result.finally(function () {
+                  pendingRequests = Math.max(0, pendingRequests - 1);
+                });
+              } else {
+                pendingRequests = Math.max(0, pendingRequests - 1);
+              }
+              return result;
+            } catch (e) {
+              pendingRequests = Math.max(0, pendingRequests - 1);
+              throw e;
+            }
+          };
+          if (typeof window.fetch === 'function') {
+            const origFetch = window.fetch.bind(window);
+            window.fetch = function () {
+              const args = arguments;
+              return trackRequest(function () {
+                return origFetch.apply(window, args);
+              });
+            };
+          }
+          if (window.XMLHttpRequest) {
+            const origOpen = window.XMLHttpRequest.prototype.open;
+            const origSend = window.XMLHttpRequest.prototype.send;
+            window.XMLHttpRequest.prototype.open = function () {
+              this.__anchorTracked = true;
+              return origOpen.apply(this, arguments);
+            };
+            window.XMLHttpRequest.prototype.send = function () {
+              if (this.__anchorTracked) {
+                pendingRequests++;
+                const done = () => {
+                  if (this.__anchorTracked) {
+                    this.__anchorTracked = false;
+                    pendingRequests = Math.max(0, pendingRequests - 1);
+                  }
+                };
+                this.addEventListener('loadend', done);
+              }
+              return origSend.apply(this, arguments);
+            };
+          }
+          const cancel = () => {
+            if (timer !== null) {
+              clearInterval(timer);
+              timer = null;
+            }
+            if (observer !== null) {
+              try {
+                observer.disconnect();
+              } catch (e) {}
+            }
+          };
+          const adjust = () => {
+            const y = targetY();
+            const atTarget = Math.abs(window.scrollY - y) <= 2;
+            if (!atTarget || lastY === null || Math.abs(y - lastY) > 2) {
+              window.scrollTo({ top: y, behavior: 'instant' });
+              lastY = y;
+              quiet = 0;
+            } else {
+              quiet++;
+            }
+            attempts++;
+            const resourceQuiet = performance.now() - lastResourceTime > 3000;
+            // 位置连续 1.8 秒无变化、无进行中的请求且最近 3 秒无资源加载才视为稳定；最长等待 30 秒
+            if ((quiet >= 3 && pendingRequests === 0 && resourceQuiet) || attempts >= 50) {
+              cancel();
+            }
+          };
+          requestAnimationFrame(() => {
+            // 锚点链接打开时直接定位，不做动画；用户主动点击（如 TOC）仍走平滑滚动
+            window.scrollTo({ top: targetY(), behavior: 'instant' });
+            timer = setInterval(adjust, 600);
+          });
+          // 用户主动滚动时停止自动校正
+          window.addEventListener('wheel', cancel, { passive: true });
+          window.addEventListener('touchstart', cancel, { passive: true });
+          window.addEventListener('mousedown', cancel, { passive: true });
+          window.addEventListener('keydown', cancel, { passive: true });
+          return;
+        }
+      }
+      // 没有锚点时始终保持页面顶部；Wiki Hero 只在用户显式访问 #start 时定位正文。
+      window.scrollTo(0, 0);
+    };
+    if (document.readyState !== 'loading') scrollHandler();
+    else document.addEventListener('DOMContentLoaded', scrollHandler);
+  })();
+  const ctx = {
+    date_suffix: {
+      just: `刚刚`,
+      min: `分钟前`,
+      hour: `小时前`,
+      day: `天前`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    },
+    // 图标由构建期生成的 /js/stellar-icons.js 填充（defer，早于 DOMContentLoaded 就绪）
+    icons: {},
+    services: {"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}},
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"lazy_load":true,"cache_ttl":86400,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    data_cache: {"enable":true,"default_ttl":3600,"ttl":{"giscus":600,"waline":600,"artalk":600,"memos":600,"memos-user":86400,"sites":86400,"friends":86400,"friends_and_posts":86400,"siteinfo":86400},"max_entries":200},
+  };
+  const deps = {
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js`
+  }
+
+  // 主题切换提示文案（供 /js/theme.js 使用）
+  window.__STELLAR_I18N__ = {
+    light: `切换到浅色模式`,
+    dark: `切换到深色模式`,
+    auto: `切换到跟随系统配色`,
+  };
+
+  // 搜索跳转高亮：URL 带 ?kw= 时按需加载，定位正文中的匹配词
+  (function () {
+    try {
+      if (!window.location.search) return;
+      if (!new URLSearchParams(window.location.search).has('kw')) return;
+      document.addEventListener('DOMContentLoaded', function () {
+        // utils 由 /js/utils.js 定义（同时暴露 window.utils）；
+        // 未就绪时由 bootstrap 队列兜底，此处按就绪状态判断
+        if (typeof utils === 'object' && typeof utils.js === 'function') {
+          utils.js('/js/search/highlight.js', { defer: true }).catch(function () {});
+        }
+      });
+    } catch (e) {}
+  })();
+</script>
+
+
+<script>
+  // 插件注册队列：utils.js 尚未就绪时先缓存注册请求，就绪后统一补跑，
+  // 保证解析期注册的插件不因加载时序丢失。
+  window.stellar = window.stellar || {};
+  window.stellar._pluginQueue = window.stellar._pluginQueue || [];
+  window.stellar.initPlugin = function (fn, name, options) {
+    if (typeof utils === 'object' && typeof utils.initPlugin === 'function') {
+      return utils.initPlugin(fn, name, options);
+    }
+    window.stellar._pluginQueue.push({ fn: fn, name: name, options: options || {} });
+  };
+  window.stellar._flushPlugins = function () {
+    var pending = window.stellar._pluginQueue.splice(0);
+    if (typeof utils !== 'object' || typeof utils.initPlugin !== 'function') return;
+    for (var i = 0; i < pending.length; i++) {
+      try {
+        utils.initPlugin(pending[i].fn, pending[i].name, pending[i].options);
+      } catch (e) {
+        console.error('[Stellar] 插件补注册失败:', e);
+      }
+    }
+  };
+  document.addEventListener('DOMContentLoaded', function () {
+    if (typeof utils === 'object') return;
+    // utils 未就绪时补载；加载成功后由 utils.js 内部补跑插件队列
+    var s = document.createElement('script');
+    // 用 setAttribute 赋值 src，避免被基于 `s.src = "..."` 的正则
+    // （图片懒加载 / 脚本延迟优化器）误改写
+    s.setAttribute('src', '/js/utils.js?v=1.44.0');
+    s.async = false;
+    s.onerror = function () {
+      console.error('[Stellar] 无法加载 /js/utils.js，已启用内容兜底显示（sr-fallback）');
+      document.documentElement.classList.add('sr-fallback');
+    };
+    document.head.appendChild(s);
+  });
+</script>
+
+
+<!-- core: utils 必须同步加载（页尾内联插件片段在解析期即调用 utils.initPlugin） -->
+<script src="/js/utils.js?v=1.44.0"></script>
+<script>
+  // 解析期检测 utils 是否已就绪；未就绪时同步补载，
+  // 保证「utils 先于页尾插件片段定义」的不变量。
+  if (typeof utils === 'undefined') {
+    document.write('<script src="/js/utils.js?v=1.44.0"><\/script>');
+  }
+</script>
+<script defer src="/js/stellar-icons.js?v=1.44.0"></script>
+<!-- 非首屏图标异步加载：占位符替换依赖构建期生成的 js/icons/{ns}.json -->
+<script defer src="/js/icons.js?v=1.44.0" data-version="1.44.0"></script>
+<script defer src="/js/plugins/dropdown.js?v=1.44.0"></script>
+<script src="/js/main.js?v=1.44.0" defer></script>
+<script defer src="/js/theme.js?v=1.44.0"></script>
+
+
+
+<script>
+  // 先声明配置与初始化监听，再异步加载库：
+  // 保证库执行时 lazyLoadOptions 已就绪，避免 async 脚本抢先执行导致自初始化失败
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      // {% image %} 没有 .lazy-box 包裹，回退到父元素查找加载图标
+      const wrapper = el.closest('.lazy-box') || el.parentElement;
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // 监听初始化事件，获取 LazyLoad 实例
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  // 兜底：动态插入的 .lazy 元素（如站点自定义脚本在 update() 之后追加的图片）
+  // 不会被 vanilla-lazyload 自动扫描，未注册的 img.lazy 会被 CSS opacity:0 永久隐藏。
+  // MutationObserver 检测到新增 .lazy 元素后自动调用 update() 重新注册。
+  if (window.MutationObserver) {
+    window.lazyMutationObserver = new MutationObserver((mutations) => {
+      if (window.lazyMutationObserver._pending) return;
+      const hasLazy = mutations.some((m) =>
+        Array.prototype.some.call(m.addedNodes, (node) =>
+          node.nodeType === 1 &&
+          (node.matches?.('.lazy') || !!node.querySelector?.('.lazy'))
+        )
+      );
+      if (!hasLazy) return;
+      window.lazyMutationObserver._pending = requestAnimationFrame(() => {
+        window.lazyMutationObserver._pending = null;
+        window.lazyLoadInstance?.update();
+      });
+    });
+    window.lazyMutationObserver.observe(document.documentElement, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+</script>
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  (function() {
+    
+    function initGiscus() {
+      const el = document.querySelector('#comments #giscus');
+      if (!el) return;
+      
+      function load_giscus() {
+        try {
+          el.innerHTML = '';
+        } catch (error) {
+          console.error(error);
+        }
+        const script = document.createElement('script');
+        script.async = true;
+        for (const key of Object.keys(el.attributes)) {
+          const attr = el.attributes[key];
+          if (['class', 'id'].includes(attr.name) === false) {
+            script.setAttribute(attr.name, attr.value);
+          }
+        }
+        el.appendChild(script);
+      }
+      
+      util.viewportLazyload(el, load_giscus);
+    }
+    
+    // Initialize on page load
+    initGiscus();
+  })();
+</script>
+
+
+
+
+<script defer src="/js/services.js?v=1.44.0"></script>
+<script>
+  // 防御：bootstrap 被第三方优化器改写/移除导致 window.stellar.initPlugin 缺失时，
+  // 在此补一个等价注册点：utils 就绪时直接委托，未就绪时入队，utils 加载后自动补跑。
+  if (typeof window.stellar === 'undefined' || typeof window.stellar.initPlugin !== 'function') {
+    window.stellar = window.stellar || {};
+    window.stellar._pluginQueue = window.stellar._pluginQueue || [];
+    window.stellar.initPlugin = function (fn, name, options) {
+      if (typeof utils === 'object' && typeof utils.initPlugin === 'function') {
+        return utils.initPlugin(fn, name, options);
+      }
+      window.stellar._pluginQueue.push({ fn: fn, name: name, options: options || {} });
+    };
+    window.stellar._flushPlugins = function () {
+      var pending = window.stellar._pluginQueue.splice(0);
+      if (typeof utils !== 'object' || typeof utils.initPlugin !== 'function') return;
+      for (var i = 0; i < pending.length; i++) {
+        try {
+          utils.initPlugin(pending[i].fn, pending[i].name, pending[i].options);
+        } catch (e) {
+          console.error('[Stellar] 插件补注册失败:', e);
+        }
+      }
+    };
+  }
+</script>
+
+<script>window.addEventListener('DOMContentLoaded', function () { utils.js('/js/search/shortcut.js', { defer: true }); });</script><script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = Object.assign({}, ctx.search, {
+      path: `/search.json`,
+      local_search: {"field":"all","path":"/search.json","content":true,"lazy_load":true,"cache_ttl":86400,"skip_search":null,"sort":"-date"},
+    });
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script>
+<script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    mode: `auto`,
+    selector: `.timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  // auto=按需：页面存在可弹窗图片才加载；global=全局：所有页面加载
+  const isGlobal = ctx.fancybox.mode === 'global';
+  // 评论区图片（artalk/twikoo/waline）显示较小，自动支持放大；
+  // 仅绑定各评论服务的评论内容区，编辑器、表情面板等非内容区图片不弹窗
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon]):not([class*="emo"]), .with-fancybox .tk-content img:not([atk-emoticon]):not([class*="emo"]), .with-fancybox .wl-content img:not([atk-emoticon]):not([class*="emo"])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = isGlobal;
+  if (!needFancybox) {
+    needFancybox = document.querySelectorAll(selector).length !== 0;
+    if (!needFancybox) {
+      // 图片型评论系统容器：评论区图片小图需要 fancybox
+      const withFancybox = document.getElementsByClassName('with-fancybox');
+      if (withFancybox != undefined && withFancybox.length > 0) {
+        needFancybox = true;
+      }
+    }
+    if (!needFancybox) {
+      // 动态数据服务：memos 渲染的图片需要 fancybox
+      const memos = document.getElementsByClassName('ds-memos');
+      if (memos != undefined && memos.length > 0) {
+        needFancybox = true;
+      }
+    }
+  }
+  if (needFancybox) {
+    utils.css(`/css/plugins/fancybox.css?v=1.44.0`);
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      if (isGlobal) {
+        // 全局模式：正文所有非内联图片均可弹窗
+        selector += ', .md-text img:not(.inline):not([atk-emoticon])';
+      }
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  stellar.initPlugin(() => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`/css/plugins/swiper.css?v=1.44.0`);
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  }, 'swiper');
+</script>
+<script>
+  (function () {
+    // 兜底看门狗独立于插件初始化：3 秒内未完成 reveal 时强制显示 .slide-up 内容
+    let fallbackApplied = false;
+    const revealFallback = () => {
+      if (fallbackApplied) return;
+      fallbackApplied = true;
+      document.documentElement.classList.add('sr-fallback');
+    };
+    const watchdog = setTimeout(() => revealFallback(), 3000);
+
+    stellar.initPlugin(() => {
+      const els = Array.prototype.slice.call(document.querySelectorAll('.slide-up'));
+      if (els.length === 0) {
+        clearTimeout(watchdog);
+        return;
+      }
+
+    // 吸顶/固定定位容器内的元素始终在视口内（或由容器控制显隐），
+    // 但 ScrollReveal 按文档坐标判断可见性，会误判这类元素为不可见，
+    // 导致带锚点/恢复滚动位置打开页面时组件一直不显示。
+    // 解决方式：以最近的吸顶/固定祖先作为该组元素的容器，
+    // 使可见性判断恒成立，入场动画保留且不再依赖主文档滚动。
+    const findPinnedContainer = (el) => {
+      let node = el;
+      while (node && node.nodeType === 1) {
+        const pos = window.getComputedStyle(node).position;
+        if (pos === 'sticky' || pos === 'fixed') return node;
+        node = node.parentElement;
+      }
+      return null;
+    };
+
+    // 最近的滚动容器（overflow-y: auto/scroll）
+    // 吸顶容器内可能存在内部滚动容器（如侧栏 .widgets），
+    // 若直接用吸顶容器做 reveal 容器，折叠区下方的元素永远不会进入视口，导致一直不显示。
+    const findScrollContainer = (el) => {
+      let node = el.parentElement;
+      while (node && node.nodeType === 1) {
+        const oy = window.getComputedStyle(node).overflowY;
+        if (oy === 'auto' || oy === 'scroll') return node;
+        node = node.parentElement;
+      }
+      return null;
+    };
+
+    const pinnedGroups = new Map(); // 容器 -> 元素列表
+    const targets = [];
+    els.forEach((el) => {
+      const pinned = findPinnedContainer(el);
+      if (pinned) {
+        // 优先使用最近的滚动容器，其次才用吸顶容器
+        const container = findScrollContainer(el) || pinned;
+        const group = pinnedGroups.get(container) || [];
+        group.push(el);
+        pinnedGroups.set(container, group);
+      } else {
+        targets.push(el);
+      }
+    });
+    if (pinnedGroups.size === 0 && targets.length === 0) {
+      clearTimeout(watchdog);
+      return;
+    }
+
+    const slideUp = {
+      distance: `8px`,
+      duration: `1000`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+
+    utils.js(`https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js`, { defer: true })
+      .then(() => {
+        if (fallbackApplied) return;
+        if (typeof ScrollReveal !== 'function') {
+          revealFallback();
+          return;
+        }
+        try {
+          const sr = ScrollReveal();
+          if (targets.length > 0) {
+            sr.reveal(targets, { ...slideUp });
+          }
+          pinnedGroups.forEach((group, container) => {
+            sr.reveal(group, { ...slideUp, container: container });
+          });
+          clearTimeout(watchdog);
+        } catch (err) {
+          console.error('[Plugin scrollreveal] 初始化失败:', err);
+          revealFallback();
+        }
+      })
+      .catch((err) => {
+        console.error('[Plugin scrollreveal] 加载失败:', err);
+        revealFallback();
+      });
+    }, 'scrollreveal');
+  })();
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.23/dist/katex.min.css" integrity="sha384-//SZkxyB7axjCAopkAL1E1rve+ZSPKapD89Lo/lLhcsXR+zOYl5z6zJZEFXil+q0" crossorigin="anonymous">
+<script>
+  stellar.initPlugin(() => {
+    const codeElements = document.querySelectorAll('.code');
+    if (codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js', { defer: true }).then(() => {
+        if (typeof createCopyButtons === 'function') {
+          createCopyButtons(codeElements);
+        }
+      });
+    }
+  }, 'copycode');
+</script>
+<script>
+  stellar.initPlugin(() => {
+    const els = Array.prototype.slice.call(document.querySelectorAll('[data-text-adaptive]'));
+    if (els.length === 0) return;
+    utils.js('/js/color.js').then(() => utils.js('/js/plugins/adaptive-text.js')).then(() => {
+      if (typeof applyAdaptiveText === 'function') {
+        applyAdaptiveText(els);
+      }
+    });
+  }, 'adaptive-text');
+</script>
+
+
+
+<!-- inject -->
+
+</div></body></html>

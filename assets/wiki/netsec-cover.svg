@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200" width="900" height="1200" role="img" aria-label="网安">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.45" y2="1">
+      <stop offset="0" stop-color="#7b61ff"/>
+      <stop offset="1" stop-color="#4c37c9"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="1200" fill="url(#bg)"/>
+  <g fill="none" stroke="#fff" stroke-width="1.6" opacity="0.14"><rect x="540" y="40" width="62" height="1120" rx="8"/><rect x="610" y="40" width="62" height="1120" rx="8"/><rect x="680" y="40" width="62" height="1120" rx="8"/><rect x="750" y="40" width="62" height="1120" rx="8"/><rect x="820" y="40" width="62" height="1120" rx="8"/><rect x="890" y="40" width="62" height="1120" rx="8"/></g>
+  <g transform="translate(450 500) scale(5.2) translate(-50 -50)" opacity="0.95">
+    
+    <g fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M50 12 L82 24 V50 C82 70 68 82 50 89 C32 82 18 70 18 50 V24 Z"/>
+      <circle cx="50" cy="46" r="7"/>
+    </g>
+    <path d="M50 53 V68" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>
+  </g>
+</svg>

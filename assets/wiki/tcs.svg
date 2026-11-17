@@ -1,4 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" role="img" aria-label="TCS">
-  <rect width="96" height="96" rx="22" fill="#5794f2"/>
-  <text x="48" y="49" text-anchor="middle" dominant-baseline="middle" font-family="'PingFang SC','Hiragino Sans GB',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="28" font-weight="600" fill="#ffffff">TCS</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" role="img" aria-label="tcs">
+  <svg x="0" y="0" width="96" height="96" viewBox="140 170 620 620">
+<defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.45" y2="1">
+      <stop offset="0" stop-color="#5794f2"/>
+      <stop offset="1" stop-color="#2f5fb3"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="1200" fill="url(#bg)"/>
+  <g fill="none" stroke="#fff" stroke-width="5.2" opacity="0.14"><circle cx="738" cy="360" r="162"/><circle cx="738" cy="360" r="270"/><circle cx="738" cy="360" r="378"/><circle cx="738" cy="360" r="486"/></g>
+  <g stroke="#fff" fill="none" stroke-linejoin="round" stroke-linecap="round">
+    <rect x="94" y="550" width="712" height="142" rx="14" stroke-width="15.6" opacity=".94"/>
+    <path d="M196 550 V692 M298 550 V692 M400 550 V692 M502 550 V692 M604 550 V692 M706 550 V692" stroke-width="10.4" opacity=".8"/>
+    <rect x="400" y="550" width="102" height="142" fill="#fff" fill-opacity=".18" stroke-width="15.6"/>
+    <g font-family="monospace" font-size="53" text-anchor="middle" fill="#fff" stroke="none"><text x="145" y="639">1</text><text x="247" y="639">0</text><text x="349" y="639">1</text><text x="451" y="639">1</text><text x="553" y="639">0</text><text x="655" y="639">1</text><text x="757" y="639">0</text></g>
+    <path d="M451 546 V462" stroke-width="18.2"/>
+    <path d="M434 481 L451 462 L468 481" stroke-width="18.2"/>
+    <rect x="300" y="295" width="302" height="148" rx="24" stroke-width="18.2"/>
+    <circle cx="347" cy="369" r="13" stroke-width="13.0"/>
+    <path d="M380 369 H425 M477 369 H525" stroke-width="15.6"/>
+    <circle cx="451" cy="369" r="26" stroke-width="15.6"/>
+    <path d="M451 343 V395 M425 369 H477" stroke-width="10.4" opacity=".7"/>
+    <path d="M547 353 L564 369 L547 385" stroke-width="15.6"/>
+    <path d="M300 369 H244 V489 H349" stroke-width="13.0" stroke-dasharray="8 13" opacity=".65"/>
+    <path d="M335 475 L350 489 L335 503" stroke-width="13.0" opacity=".65"/>
+    <path d="M602 369 H660 V489 H553" stroke-width="13.0" stroke-dasharray="8 13" opacity=".65"/>
+    <path d="M567 475 L552 489 L567 503" stroke-width="13.0" opacity=".65"/>
+  </g>
+  </svg>
 </svg>

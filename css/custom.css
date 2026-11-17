@@ -37,3 +37,11 @@
   width: 96px;
   height: 96px;
 }
+
+/* 去掉卡片标题 hover 时的主题色下划块（总览页和博客列表都受影响） */
+.post-list .post-card .post-title::after,
+.post-list .post-card:hover .post-title::after {
+  content: none;
+  height: 0;
+  opacity: 0;
+}
