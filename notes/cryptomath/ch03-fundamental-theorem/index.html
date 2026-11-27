@@ -28,7 +28,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://ooo.0x0.ooo/2024/08/28/OtdcdI.jpg">
 <meta property="article:published_time" content="2026-09-20T06:58:24.000Z">
-<meta property="article:modified_time" content="2026-11-16T15:40:21.755Z">
+<meta property="article:modified_time" content="2026-11-27T03:05:28.484Z">
 <meta property="article:author" content="renxiaodaifu">
 <meta property="article:tag" content="数论">
 <meta property="article:tag" content="算术基本定理">
@@ -330,6 +330,60 @@
   <div class="widget-body"><div class="ui-collection" data-layout="list" data-variant="nav" data-density="compact">
   
     
+<a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/cryptomath/ch03-fundamental-theorem/" title="密码学数学基础 - 整数模与算术基本定理">
+  
+  
+  
+    <span class="ui-collection__content">
+      <span class="ui-collection__prefix">密码学数学基础</span>
+      <span class="ui-collection__title">密码学数学基础 - 整数模与算术基本定理</span>
+      
+      
+    </span>
+  
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/cryptomath/ch02-euclid/" title="密码学数学基础 - 欧几里得算法">
+  
+  
+  
+    <span class="ui-collection__content">
+      <span class="ui-collection__prefix">密码学数学基础</span>
+      <span class="ui-collection__title">密码学数学基础 - 欧几里得算法</span>
+      
+      
+    </span>
+  
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/cryptomath/ch04-congruence/" title="密码学数学基础 - 同余与剩余系">
+  
+  
+  
+    <span class="ui-collection__content">
+      <span class="ui-collection__prefix">密码学数学基础</span>
+      <span class="ui-collection__title">密码学数学基础 - 同余与剩余系</span>
+      
+      
+    </span>
+  
+  
+  
+  
+</a>
+
+  
+    
 <a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/cryptomath/ch11-groups/" title="密码学数学基础 - 群、同态与循环群">
   
   
@@ -455,60 +509,6 @@
 </a>
 
   
-    
-<a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/tcs/lecture-3/" title="Church-Turing Thesis">
-  
-  
-  
-    <span class="ui-collection__content">
-      <span class="ui-collection__prefix">TCS</span>
-      <span class="ui-collection__title">Church-Turing Thesis</span>
-      
-      
-    </span>
-  
-  
-  
-  
-</a>
-
-  
-    
-<a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/reliability/" title="总览">
-  
-  
-  
-    <span class="ui-collection__content">
-      <span class="ui-collection__prefix">可靠计算</span>
-      <span class="ui-collection__title">总览</span>
-      
-      
-    </span>
-  
-  
-  
-  
-</a>
-
-  
-    
-<a class="ui-collection__item card-hover card-hover--spotlight" href="/notes/signal/" title="总览">
-  
-  
-  
-    <span class="ui-collection__content">
-      <span class="ui-collection__prefix">信号处理原理</span>
-      <span class="ui-collection__title">总览</span>
-      
-      
-    </span>
-  
-  
-  
-  
-</a>
-
-  
 </div></div>
   
 </widget>
@@ -528,7 +528,7 @@
     
     <div class="top bread-nav footnote"><div class="top-row"><div class="left" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
 <span class="sep"></span><a class="cap breadcrumb" id="menu" href="/wiki/">文档</a><span class="sep"></span><a class="cap breadcrumb" id="proj" href="/notes/cryptomath/">密码学数学基础</a></div></div><div class="meta-row">
-<div class="flex-row" id="post-meta"><span class="text created">更新于：<time datetime="2026-11-16T15:40:21.755Z">2026-11-16</time></span></div>
+<div class="flex-row" id="post-meta"><span class="text created">更新于：<time datetime="2026-11-27T03:05:28.484Z">2026-11-27</time></span></div>
 </div></div>
     
     <div class="bottom only-title">
@@ -547,7 +547,7 @@
 <p>前面已经证明，每个大于 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn></mrow><annotation encoding="application/x-tex">1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 的整数都可以分解为素数的乘积。这一篇补上唯一性的证明</p>
 <p>关键是先理解整数线性组合构成的集合，由此得到 Bézout 等式，再证明一个素数整除乘积时，必然整除其中某个因子</p>
 <h2 id="整数模">整数模</h2>
-<p><strong>整数模</strong>（modulus）是对加法、减法封闭的非空整数集合。这里的“模”是集合的名称，需要与同余式中“模 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span>”的整数 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 区分</p>
+<p><strong>整数模</strong>（modulus）是对加法、减法封闭的非空整数集合。这里的“模”是集合的名称，并非同余式中“模 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span>”中的整数 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span></p>
 <p>具体来说，非空集合 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mo>⊆</mo><mi mathvariant="double-struck">Z</mi></mrow><annotation encoding="application/x-tex">S\subseteq\mathbb{Z}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8193em;vertical-align:-0.136em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊆</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6889em;"></span><span class="mord mathbb">Z</span></span></span></span> 是整数模，要求</p>
 <p class="katex-block math-block"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>m</mi><mo separator="true">,</mo><mi>n</mi><mo>∈</mo><mi>S</mi><mspace width="1em"></mspace><mo>⟹</mo><mspace width="1em"></mspace><mi>m</mi><mo>+</mo><mi>n</mi><mo>∈</mo><mi>S</mi><mo separator="true">,</mo><mtext>&nbsp;</mtext><mi>m</mi><mo>−</mo><mi>n</mi><mo>∈</mo><mi>S</mi></mrow><annotation encoding="application/x-tex">m,n\in S\quad\Longrightarrow\quad m+n\in S,\ m-n\in S
 </annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7335em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">m</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7073em;vertical-align:-0.024em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mspace" style="margin-right:1em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⟹</span><span class="mspace" style="margin-right:1em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mpunct">,</span><span class="mspace">&nbsp;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span></span></p>
