@@ -213,6 +213,40 @@
 .gf-cal-cell[data-l="2"] { background: #1f6f3f; }
 .gf-cal-cell[data-l="3"] { background: #3aa356; }
 .gf-cal-cell[data-l="4"] { background: var(--gf-green); }
+.gf-cal-cell:hover { box-shadow: 0 0 0 1px rgba(216, 217, 218, .55); }
+
+.gf-cal-tip {
+  position: fixed;
+  z-index: 60;
+  min-width: 140px;
+  max-width: 280px;
+  padding: 8px 10px;
+  background: #1f2329;
+  border: 1px solid var(--gf-border);
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+  color: var(--gf-text);
+  font-size: 12px;
+  line-height: 1.5;
+  pointer-events: none;
+}
+.gf-cal-tip[hidden] { display: none; }
+.gf-cal-tip b { font-weight: 600; }
+.gf-cal-tip .gf-cal-tip-meta { color: var(--gf-dim); }
+.gf-cal-tip ul { margin: 4px 0 0; padding: 0; list-style: none; }
+.gf-cal-tip li {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gf-cal-tip .gf-cal-tip-kind {
+  display: inline-block;
+  min-width: 30px;
+  margin-right: 6px;
+  color: var(--gf-dim);
+}
+.gf-cal-tip .gf-cal-tip-more,
+.gf-cal-tip .gf-cal-tip-none { color: var(--gf-dim); }
 
 @media (max-width: 900px) {
   .gf-grid { grid-template-columns: minmax(0, 1fr); }

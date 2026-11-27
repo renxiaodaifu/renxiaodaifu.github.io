@@ -9,11 +9,20 @@
     splitLine: {lineStyle: {color: '#22262b'}}
   };
 
+  const WEEKDAYS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+
   const state = {range: 'all', type: 'all'};
   let all = [];
+  let calDays = {};
+  let calCell = null;
   const charts = {};
+  const calTip = {node: null};
 
   const $ = id => document.getElementById(id);
+
+  function esc(text) {
+    return String(text).replace(/[&<>"]/g, ch => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[ch]));
+  }
 
   function ymd(date) {
     const y = date.getFullYear();
@@ -102,11 +111,59 @@
       .join('');
   }
 
+  function hideCalTip() {
+    if (calTip.node && !calTip.node.hidden) {
+      calTip.node.hidden = true;
+      calTip.node.innerHTML = '';
+    }
+    calCell = null;
+  }
+
+  function placeCalTip(x, y) {
+    const node = calTip.node;
+    if (!node || node.hidden) return;
+    const gap = 14;
+    const rect = node.getBoundingClientRect();
+    let left = x + gap;
+    let top = y + gap;
+    if (left + rect.width > window.innerWidth - 8) left = x - rect.width - gap;
+    if (top + rect.height > window.innerHeight - 8) top = y - rect.height - gap;
+    node.style.left = Math.max(8, left) + 'px';
+    node.style.top = Math.max(8, top) + 'px';
+  }
+
+  function showCalTip(cell, x, y) {
+    const key = cell.dataset.date;
+    const dayItems = calDays[key] || [];
+    const total = dayItems.length;
+    const [year, month, day] = key.split('-').map(Number);
+    const weekday = WEEKDAYS[new Date(year, month - 1, day).getDay()];
+    const rows = dayItems
+      .slice(0, 6)
+      .map(item => `<li><span class="gf-cal-tip-kind">${item.type === 'wiki' ? '笔记' : '博客'}</span>${esc(item.title)}</li>`)
+      .join('');
+    const more = total > 6 ? `<li class="gf-cal-tip-more">…等 ${total} 篇</li>` : '';
+    const body = total ? `<ul>${rows}${more}</ul>` : '<div class="gf-cal-tip-none">当天没有产出</div>';
+
+    if (!calTip.node) {
+      calTip.node = document.createElement('div');
+      calTip.node.className = 'gf-cal-tip';
+      document.body.appendChild(calTip.node);
+    }
+    calTip.node.innerHTML = `<b>${key} ${weekday}</b><div class="gf-cal-tip-meta">${total} 篇</div>${body}`;
+    calTip.node.hidden = false;
+    placeCalTip(x, y);
+  }
+
   function renderCalendar(items) {
     const counts = {};
+    const days = {};
     items.forEach(item => {
       counts[item.date] = (counts[item.date] || 0) + 1;
+      (days[item.date] || (days[item.date] = [])).push(item);
     });
+    calDays = days;
+    hideCalTip();
 
     if (items.length === 0) {
       $('gf-cal').innerHTML = '<div class="gf-note">没有数据</div>';
@@ -130,7 +187,7 @@
         const key = ymd(cursor);
         const count = counts[key] || 0;
         const level = count === 0 ? 0 : Math.min(4, Math.ceil((count / max) * 4));
-        week.push(`<div class="gf-cal-cell" data-l="${level}" title="${key} · ${count} 篇"></div>`);
+        week.push(`<div class="gf-cal-cell" data-l="${level}" data-date="${key}" aria-label="${key} · ${count} 篇"></div>`);
         cursor.setDate(cursor.getDate() + 1);
       }
       weeks.push(`<div class="gf-cal-week">${week.join('')}</div>`);
@@ -205,13 +262,13 @@
         counts[tag] = (counts[tag] || 0) + 1;
       });
     });
-    const rows = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 20).reverse();
+    const rows = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 10).reverse();
 
     chart('gf-tags').setOption(baseOption({
       tooltip: {trigger: 'axis', backgroundColor: '#1f2329', borderColor: '#2c3235', textStyle: {color: '#d8d9da'}},
       grid: {left: 90, right: 24, top: 10, bottom: 20},
       xAxis: Object.assign({}, AXIS, {type: 'value', splitNumber: 2, axisLabel: {color: '#8e8e8e', fontSize: 10, formatter: v => (v >= 1000 ? v / 1000 + 'k' : v)}}),
-      yAxis: Object.assign({}, AXIS, {type: 'category', data: rows.map(row => row[0])}),
+      yAxis: Object.assign({}, AXIS, {type: 'category', data: rows.map(row => row[0]), axisLabel: {color: '#8e8e8e', fontSize: 11, interval: 0}}),
       series: [{
         type: 'bar',
         barMaxWidth: 12,
@@ -388,6 +445,19 @@
       state.type = value;
       render();
     });
+    const cal = $('gf-cal');
+    cal.addEventListener('mousemove', event => {
+      const cell = event.target.closest('.gf-cal-cell');
+      if (cell !== calCell) {
+        calCell = cell;
+        if (cell) showCalTip(cell, event.clientX, event.clientY);
+        else hideCalTip();
+      } else if (cell) {
+        placeCalTip(event.clientX, event.clientY);
+      }
+    });
+    cal.addEventListener('mouseleave', hideCalTip);
+    window.addEventListener('scroll', hideCalTip, {passive: true});
     document.addEventListener('click', () => closeMenus());
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape') closeMenus();
